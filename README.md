@@ -1,5 +1,10 @@
 # JSONScript
-Platform independent scripting language expressed in JSON format
+
+Platform independent asynchronous and concurrent scripting language using JSON format.
+
+JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests.
+
+It uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic). It implements control structures that are somewhat similar to JavaScript. It is fundamentally asynchronous and concurrent without the need to use any special keywords for it. It is extremely flexible and powerful as it allows to define functions, macros and to manipulate the script during it's execution. At the same time it is simple as it doesn't define or create any data structures apart from those that are created in the result of the JSONScript script execution. All the actual processing in the remote system is done synchronously or asynchronously by the executors supplied by the host environment.
 
 
 ## Problem
@@ -21,9 +26,9 @@ In some cases, developers implement "batch endpoints" that allow to process mult
 
 JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute all the containig instructions sequesntially, or in parallel, passing results from one instruction to another when required, and returning all results to the client. All this in a single HTTP (or any other transport) request.
 
-JSONScript allows to keep the API of remote system conscise and simple, only implementing simple basic methods. At the same time JSONScript allows the client to implement an advanced logic with conditions and looping, sequential and concurrent execution, defining and calling functions and handling exceptions. So quite advanced execution can be requested from the remote system in a single transport request.
+JSONScript allows to keep the API of remote system conscise and simple, only implementing simple basic methods. At the same time JSONScript allows the client to implement an advanced logic with conditions and looping, sequential and concurrent execution, defining and calling functions and handling exceptions. In this way quite advanced execution can be requested from the remote system in a single transport request.
 
-At the same time JSONScript allows keeping the remote system completely secure as only the commands registered with interpreter can be envoked from the JSONScript script.
+At the same time JSONScript allows keeping the remote system completely secure as only the executors registered with the interpreter can be used from the JSONScript script.
 
 
 ## Qualities
@@ -31,9 +36,9 @@ At the same time JSONScript allows keeping the remote system completely secure a
 
 - Platform and language independent
 - Asynchronous and concurrent
-- Supports all control from instructions from general purpose languages, including functions and exception handling
-- Does not support any data structures or calculations - they will be provided by the host platform.
-- Results from all previous instructions in the script can be used as parameters by the following instructions.
+- Implements all control from instructions from general purpose languages, including functions, macros and exception handling
+- Does not implement any data structures or calculations - they should be provided by the host platform.
+- Results from previously executed instructions in the script can be used as parameters by the following instructions.
 
 
 ## Language
@@ -93,14 +98,14 @@ JSONScript to create a resource and a child resource using basic HTTP endpoints 
 ```JSON
 { "$exec": "router",
   "$method": "POST",
-  "args":
+  "$args":
   { "url": "/child_resource",
     "body":
     { "name": "My child resource",
       "resource_id":
       { "$exec": "router",
         "$method": "POST",
-        "args":
+        "$args":
         { "url": "/resource",
           "body": { "name": "My resource" } } } } } }
 ```
@@ -167,16 +172,16 @@ JSONScript to create a resource and a child resource using basic HTTP endpoints 
 ```JSON
 [ { "$exec": "router",
     "$method": "POST",
-    "args":
+    "$args":
     { "url": "/resource",
-    "body": { "name": "My resource" } } },
+      "body": { "name": "My resource" } } },
   { "$exec": "router",
     "$method": "POST",
-    "args":
+    "$args":
     { "url": "/child_resource",
-    "body":
-    { "name": "My child resource",
-      "resource_id": { "$ref": -1 } } } } ]
+      "body":
+      { "name": "My child resource",
+        "resource_id": { "$ref": -1 } } } } ]
 ```
 
 In this example `{ "$ref": -1 }` will be substituted with the result of the previous instruction execution. Instead of relative indeces, absolute indeces can also be used, with the first instruction in the list having the index of 0. So in this example `{ "$ref": 0 }` would mean the same.
@@ -222,12 +227,12 @@ Request two resources in parallel:
 { "1": 
   { "$exec": "router",
     "$method": "GET",
-    "args":
+    "$args":
     { "url": "/resource/1" } },
   "2":
   { "$exec": "router",
     "$method": "GET",
-    "args":
+    "$args":
     { "url": "/resource/2" } } }
 ```
 
@@ -257,7 +262,7 @@ Request post with title "My post" and all comments:
 { "post": 
   { "$exec": "router",
     "$method": "GET",
-    "args":
+    "$args":
     { "url": "/post" }
     { "qs": 
       { "title": "My post",
@@ -265,7 +270,7 @@ Request post with title "My post" and all comments:
   "comments":
   { "$exec": "router",
     "$method": "GET",
-    "args":
+    "$args":
     { "$/": "get all comments for post_id",
       "url": "/comments/:post_id",
       "params": { "post_id": { "$ref": "post.id" } } } } }
@@ -284,21 +289,32 @@ JSONScript supports control flow instructions that affect the order of excution 
 All control frow constructs are objects with some special key starting from "$".
 
 
-#### $end - Ending script execution
------
+#### $res, $return, $end - creating results and terminating script execution
+
+There are three keys that would create result, return value from the current function or completely terminate the script:
+
+- `$res` - defines the result of the current execution construct (array or object). It will also create the return value of the function or of the whole script but only if its containing construct is the last construct executed in the function or the current script. See [Functions]. It is the most recommended instruction to use, as it doesn't break the flow of the script.
+
+- `$return` - in addition to defining the result as `$res` does it also exits the currently executed function. Using `$return` outside of function is a syntax error.
+
+- `$end` - defines the result and terminates the whole script execution. In most cases, this instruction is not needed and not recommended.
+
 
 Syntax:
 
 ```
+{ "$res": <JSONScript> }
+
+{ "$return": <JSONScript> }
+
 { "$end": <JSONScript> }
 ```
 
-
 In some cases you may only want the result of the last step in sequential execution returned as a script result.
 
-It can be done using `$end` instruction, that is an object with the single `$end` key. The value of the key will be the result of the script execution. As everything, the key can be any valid JSONScript - scalar, data, or the script which result will be the result of the containing script (or function) execution.
+It can be done using `$res` instruction, that is an object with the single `$res` key. The value of the key will be the result of the script execution. As everything, the key can be any valid JSONScript - scalar, data, or the script which result will be the result of the containing block, script (or function) execution.
 
-Although it is possible to always use `$end` to explicitly declare the script results, it is not idiomatic and not recommended, as it would require additional processing from the interpreter.
+Although it is possible to always use `$res` to explicitly declare the results, it is not idiomatic and not recommended, as it would require additional processing from the interpreter.
 
 
 Exapmle:
@@ -309,7 +325,7 @@ Add the comment to the post with the title "My post":
 [ { "post": 
     { "$exec": "router",
       "$method": "GET",
-      "args":
+      "$args":
       { "url": "/post" }
       { "qs": 
         { "title": "My post",
@@ -317,11 +333,11 @@ Add the comment to the post with the title "My post":
     "comment":
     { "$exec": "router",
       "$method": "POST",
-      "args":
+      "$args":
       { "url": "/comments/:post_id",
         "params": { "post_id": { "$ref": "post.id" } },
         "body": { "text": "My comment" } } } },
-  { "$end": { "$ref": "-.comment" } } ]
+  { "$res": { "$ref": "-.comment" } } ]
 ```
 
 In the example above the result of `{ "$ref": "-.comment" }` is the result of substep "comment" in the previous step. `{ "$ref": "0.comment" }` would return the same, but the former is idiomatic and recommended as it allows adding additional steps in the beginning without changing the `$end` instruction.
@@ -355,4 +371,57 @@ The `$each` construct allows to call another script passing each element of the 
 
 Examples:
 
+Request 10 latest posts of a given user together with comments
 
+```JSON
+{ "$each":
+  { "$exec": "router",
+    "$method": "GET",
+    "$args":
+    { "url": "/post" }
+    { "qs": 
+      { "user_id": 37,
+        "limit": 10 } } },
+  "$do":
+  [ { "$exec": "router",
+      "$method": "GET",
+      "$args":
+      { "url": "/comments/:post_id",
+        "params": { "post_id": { "$ref": "~.id" } } } },
+    { "$res": 
+      { "post": { "$ref": "~" },
+        "comments": { "$ref": "-" } } } ] }
+```
+
+The example above will iterate the list of posts for the specified user, up to 10 posts (as should be defined in `router`), and request the list of comments for each post. `$res` instruction is used to include both the post and the coments in the result; without it the result would be the array of arrays, with internal arrays containing comments.
+
+`{ "$ref": "~" }` refers to the iteration value (the post), `{ "$ref": "-" }` refers to the result of the previous instruction in the array (the array of comments).
+
+With named iteration value and the concurrency limit (requested from executor "options" that could have been supplied to the interpreter) the script could look like this:
+
+```JSON
+{ "$each":
+  { "$exec": "router",
+    "$method": "GET",
+    "$args":
+    { "url": "/post" }
+    { "qs": 
+      { "user_id": 37,
+        "limit": 10 } } },
+  "$as": "post"
+  "$do":
+  [ { "$exec": "router",
+      "$method": "GET",
+      "$args":
+      { "url": "/comments/:post_id",
+        "params": { "post_id": { "$ref": "post.id" } } } },
+    { "$res": 
+      { "post": { "$ref": "post" },
+        "comments": { "$ref": "-" } } } ],
+  "$concurrency":
+  { "$exec": "options",
+    "$method": "get",
+    "$args": "concurrency" } }
+```
+
+This example is just to show that any JSONScript can be used for any value, it is more likely that concurency won't be passed in the script at all and instead supplied as an option to the interpreter by the host environment/application.

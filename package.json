@@ -1,0 +1,23 @@
+{
+  "name": "jsonscript",
+  "version": "0.0.1",
+  "description": "Platform independent scripting language using JSON format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JSONScript/jsonscript.git"
+  },
+  "keywords": [
+    "JSON",
+    "JSONScript"
+  ],
+  "author": "Evgeny Poberezkin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JSONScript/jsonscript/issues"
+  },
+  "homepage": "https://github.com/JSONScript/jsonscript"
+}

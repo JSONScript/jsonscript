@@ -7,8 +7,19 @@ JSONScript is created to manage scripted execution in remote systems to avoid th
 It uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic). It implements control structures that are somewhat similar to JavaScript. It is fundamentally asynchronous and concurrent without the need to use any special keywords for it. It is extremely flexible and powerful as it allows to define functions, macros and to manipulate the script during it's execution. At the same time it is simple as it doesn't define or create any data structures apart from those that are created in the result of the JSONScript script execution. All the actual processing in the remote system is done synchronously or asynchronously by the executors supplied by the host environment.
 
 
+## Project state
+
+JSONScript has been recently started and currently is under development. This repository contains language specification that is being finalized and no other development has been started yet.
+
+Soon there will be a JavaScript interpreter for JSONScript and a compiler of JSONScript to JavaScript. Once it is done, there will be the middleware for express web framework to support batch processing of requests on the server using JSONScript.
+
+
+## Mailing list
+
+If you would like to receive an email when some usable part is complete, please sign up to the Mailchimp mailing list [here](http://eepurl.com/bmSE3z).
+
+
 ## Problem
------
 
 Management of remote systems is usually done via APIs.
 
@@ -22,7 +33,6 @@ In some cases, developers implement "batch endpoints" that allow to process mult
 
 
 ## Solution
------
 
 JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute all the containig instructions sequesntially, or in parallel, passing results from one instruction to another when required, and returning all results to the client. All this in a single HTTP (or any other transport) request.
 
@@ -32,7 +42,6 @@ At the same time JSONScript allows keeping the remote system completely secure a
 
 
 ## Qualities
------
 
 - Platform and language independent
 - Asynchronous and concurrent
@@ -43,7 +52,6 @@ At the same time JSONScript allows keeping the remote system completely secure a
 
 
 ## Language
------
 
 JSONScript uses JSON format to express the script.
 
@@ -55,7 +63,6 @@ If there is no execution instructions in JSON, it will return the same JSON as t
 
 
 ### $exec - basic execution instruction
------
 
 Syntax:
 
@@ -135,7 +142,6 @@ Instruction to execute bash script (e.g., to use on internal network):
 
 
 ### Comments
------
 
 Syntax:
 
@@ -147,7 +153,6 @@ Comments can be used inside JSONScript. To any object "$/" key can be added - it
 
 
 ### Sequential execution
------
 
 Syntax:
 
@@ -193,7 +198,6 @@ Results of previous sub-instructions and super-instructions can also be referred
 
 
 ### Parallel execution
------
 
 Syntax:
 
@@ -285,7 +289,6 @@ Interpreter should try to detect any possible circular references as early as po
 
 
 ### Calculations
------
 
 Syntax:
 
@@ -315,7 +318,6 @@ TODO
 
 
 ### Functions
------
 
 Syntax:
 
@@ -338,7 +340,6 @@ TODO
 
 
 ### Control flow
------
 
 JSONScript supports control flow instructions that affect the order of excution by supporting loops, conditionals, functions, exception handling and returning results from the script.
 
@@ -548,7 +549,6 @@ If you need to do some other kind of aggregation and you want to accentuate the 
 
 
 ### $if and $switch - conditional constructs
------
 
 Syntax:
 
@@ -564,7 +564,6 @@ Syntax:
 ```
 
 #### $if
------
 
 `$if` - the script evaluating the condition.
 
@@ -579,7 +578,6 @@ TODO
 
 
 #### $switch
------
 
 `$switch` - the script evaluating the selector. Can be any simple value that will be converted to string to match the key in the `$cases`.
 

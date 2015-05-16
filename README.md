@@ -4,7 +4,7 @@ Platform independent asynchronous and concurrent scripting language using JSON f
 
 JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests.
 
-It uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic). It implements control structures that are somewhat similar to JavaScript. It is fundamentally asynchronous and concurrent without the need to use any special keywords for it. It is extremely flexible and powerful as it allows to define functions, macros and to manipulate the script during it's execution. At the same time it is simple as it doesn't define or create any data structures apart from those that are created in the result of the JSONScript script execution. All the actual processing in the remote system is done synchronously or asynchronously by the executors supplied by the host environment.
+It uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic). It implements control structures that are somewhat similar to JavaScript. It is fundamentally asynchronous and concurrent without the need to use any special keywords for it. It is extremely flexible and powerful as it allows to define and pass functions and closures, macros and to manipulate the script during it's execution. At the same time it is simple as it doesn't define or create any data structures apart from those that are created in the result of the JSONScript script execution. All the actual processing in the remote system is done synchronously or asynchronously by the executors supplied by the host environment.
 
 
 ## Project state
@@ -27,28 +27,51 @@ It is often required to make multiple sequential or parallel calls, sometimes wi
 
 1. Sending multiple requests to the remote system and implementing all the logic in the client system. The advantage of this approach is that the remote system remains unchanged and client can easily change the logic and flow of requests. The disadvantage is the latency - each request should travel via the network.
 
-2. Implementing additional methods/endpoints in the remote system. The advantage of this approach is that the client has to make only one request. The disadvantage is that it requires changing the remote system (= coding + testing + documenting + deploying + monitoring + supporting...). In some cases it is simply impossible. When it is possible, it inevitably leads to the frowing complexity of the remote system as more and more specialized methods/APIs are added to it. 
+2. Implementing additional methods/endpoints/parameters in the remote system. The advantage of this approach is that the client has to make only one request. The disadvantage is that it requires changing the remote system (= coding + testing + documenting + deploying + monitoring + supporting...). In some cases it is simply impossible. When it is possible, it inevitably leads to the growing complexity of the remote system as more and more specialized methods/APIs are added to it. 
 
-In some cases, developers implement "batch endpoints" that allow to process multiple requests in parallel in a single HTTP request. It covers some of the cases when multiple requests are sent, but only a relatively small share.
+In some cases, developers implement "batch endpoints" that allow to process multiple requests in parallel in a single HTTP request. It covers some of the cases when multiple requests are sent, but not all.
 
 
 ## Solution
 
-JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute all the containig instructions sequesntially, or in parallel, passing results from one instruction to another when required, and returning all results to the client. All this in a single HTTP (or any other transport) request.
+JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute all the containig instructions sequentially, or in parallel, and returning all results to the client. All this in a single HTTP (or any other transport) request.
 
-JSONScript allows to keep the API of remote system conscise and simple, only implementing simple basic methods. At the same time JSONScript allows the client to implement an advanced logic with conditions and looping, sequential and concurrent execution, defining and calling functions and handling exceptions. In this way quite advanced execution can be requested from the remote system in a single transport request.
+JSONScript allows to keep the API of remote system conscise and simple, only implementing basic methods. At the same time JSONScript allows the client to implement an advanced logic with conditions and looping, sequential and concurrent execution, defining and calling functions and handling exceptions. In this way quite advanced execution can be requested from the remote system in a single transport request.
 
-At the same time JSONScript allows keeping the remote system completely secure as only the executors registered with the interpreter can be used from the JSONScript script.
+At the same time JSONScript allows keeping the remote system completely secure as only the executors registered with the interpreter can be used from the JSONScript script and the interpreter can limit resources (time, memory, etc.) that the script can use.
 
 
-## Qualities
+## JSONScript qualities
 
 - Platform and language independent
 - Asynchronous and concurrent
-- Implements calculations
-- Implements all control from instructions from general purpose languages, including functions, macros and exception handling
-- Does not implement any data structures - they should be provided by the host platform.
-- Results from previously executed instructions in the script can be used as parameters by the following instructions.
+- All control flow instructions from general purpose languages, including functions and exception handling
+- Macros
+- Calculations and string manipulations
+- No data structures apart from JSON itself.
+- Results from executed instructions can be used as parameters by the following instructions.
+
+
+## Script execution
+
+As the script executes, each instruction returns some data. By default this data replaces the script itself and all results will be available to the interpreter to pass back to the host system that requested execution. Host system usually sends results back to the client, but can do anything else with them, e.g. logging, storing to the database, etc.)
+
+There are instructions `$result` and `$results` that change which results will be stored after executing certain instructions.
+
+
+## TODO: Improvements to the current version
+
+- remove relative references, use only named references, $scope and $root reserved for the current scope and the root of the script.
+
+- allow using user defined symbols in keys - it would make scripts more conscise.
+e.g. use { $<funcName>: <JSONScript:params> } instead of { $call: <JSONScript:funcName>, $args: <params> }. Maybe keep $call syntax as well to support computed names. Maybe require that function names start from lowercase letters and executors from capital letters, so { $<Executor>: "<method>", $args: <JSONScript > } could be used. Or even { "$Executor.method": <JSONScript:params> }.  Or maybe for executors $exec is a good idea... Or maybe keep both ways to allow for computed executors names and methods.
+Also to create a named reference simply { $<reference>: <JSONScript > } (but maybe keep computed reference names as well with the existing syntax)
+
+- For $script add $sandbox option. $sandbox: false to prevent access to outside symbols, root and scope. Essentially, script will execute in its own scope with no access to the outside scope. $sandbox: [ "$scope", "$a" ] will only allow access to certain symbols ($scope should not allow $scope.$scope meaning traversing up the scope tree).
+
+- { $get: <JSONScript$reference> } and { $set: <JSONScript:$reference>, $value: <JSONScript>} to get and overwrite JSON tree. In this way $set may replace $res (result). Or maybe $result should still be used... Remove { $: "ref" }? or maybe keep it. So { $a: 5 } to define and { $:"a" } to get and maybe { "$a=": 7 } to set. In which case { "$a=$": "b" } makes sense. In this case { "$a$": "b"} is not needed as it would simply create another reference to the same point in tree.
+
+- { $def: <funcName>, $args: <argumentsNames>, $func: <JSONScript>}. or { <$funcName>: <argumentsNames>, "$func": <JSONScript> }. In which case to call { <$funcName>: <arguments> } or  { $call: <funcName>, $args: <arguments> }
 
 
 ## Language
@@ -57,43 +80,56 @@ JSONScript uses JSON format to express the script.
 
 A valid JSONScript script can be an object or an array.
 
-JSON data is a valid JSONScript as long as none of the objects keys use $ as the first symbol. If you need to use JSON data with the key starting with "$", it can be escaped with "\": `{ "\$exec": "name" }`.
+JSON data is a valid JSONScript as long as none of the objects keys use $ as the first symbol. If you need to use JSON data with the key starting with "$", it can be escaped with "\": `{ "\$exec": "name" }`. This "\" will be removed from data by JSONScript interpreter.
 
-If there is no execution instructions in JSON, it will return the same JSON as the result of it's execution by JSONScript interpreter.
+Keys starting from "$" mean either JSONScript coomands or some variable/function/executor names.
+
+If there is no execution instructions in JSONScript ( no keys starting with "$"), it will return the same JSON as the result.
 
 
-### $exec - basic execution instruction
+### Envoking methods of executors provided by the host environment.
 
 Syntax:
 
 ```
-{ "$exec": <JSONScript>,
-  "$method": <JSONScript>,
+{ "$exec": <JSONScript:string:Executor>,
+  "$method": <JSONScript:string:method>,
   "$args": <JSONScript> }
 ```
 
-Basic instruction in JSONScript is Object that has keys `$exec` (shortened "executor"), `$method` and `$args`.
+or
+
+```
+{"$<Executor>.<method>(": <JSONScript:arguments> }
+```
+
+Executor should be registered with the interpreter before it can be used in the script. The name of the executor should be a valid identifier (first character is latin letter, others are letters, numbers, "_" and "-") with the first capital letter. First capital letter cannot be used in functions and variables in the script.
+
+The first (full) syntax with the keys `$exec` (shortened "executor"), `$method` and `$args` allows to compute both the name of the executor and of the method. Any script returning the string can be used in their place.
+
+Because in most cases it is not needed, the conscise syntax can be used, where both the executor and method are provided in the key and arguments in the value.
+
 
 Basic instruction is also a valid JSONScript script and can be executed on its own.
 
-Instruction can be executed synchronously or asynchronously, as determined by processor. The implementation of asynchronous execution is determined by the implementation of the interpreter and the features available in the host language - it can use callbacks, promises, generators, co-routines, etc. to determine instruction completion.
+Instruction can be executed synchronously or asynchronously, as determined by the executor. The implementation of asynchronous execution is determined by the implementation of the interpreter and the features available in the host language - it can use callbacks, promises, generators, co-routines, etc. to determine instruction completion.
 
-`$exec` is the string (or script that has the string result) with the name of the instruction processor that was previously registered with JSONScript interpreter. Depending on the implementation of the interpreter, an instruction processor can be an object or function.
+`$exec` is the name of the executor that was previously registered with JSONScript interpreter. Depending on the implementation of the interpreter, an executor can be an object or function.
 
-`$method` is the string (or script that has the string result) with the name of method that the instruction processor supports. Methods should NOT be previously registered with interpreter, if the method is not supported, the processor should throw an exception METHOD_NOT_IMPLEMENTED.
+`$method` is the name of method that the executor supports. Methods are not registered with interpreter; if the method is not supported, the executor should throw an exception METHOD_NOT_IMPLEMENTED.
 
-`$args` can be a scalar, object or array with arguments. Arguments can be references to the results of previous instructions, as shown below, and any valid JSONScript. If some of the argument is a JSONScript, the result of it's execution will be passed.
+`$args` can be a scalar, object or array with arguments. Array is passed as multiple arguments, scalar and object are passed as a single argument. Arguments can be references to the results of previous instructions, as shown below, and any valid JSONScript. If some of the argument is a JSONScript, the result of it's execution will be passed.
 
-The result of the basic instruction execution should be any valid JSON.
+The result of the basic instruction execution should be a valid JSON.
 
 
 ##### Examples
 
-Instruction to execute HTTP request on the local process (without sending request) to update some resource with id=1:
+Instruction to execute HTTP request to update some resource with id=1 (full syntax):
 
 ```JSON
-{ "$exec": "router",
-  "$method": "PUT",
+{ "$exec": "Router",
+  "$method": "put",
   "$args":
   { "url": "/resource/1",
     "body": { "active": false }
@@ -101,32 +137,26 @@ Instruction to execute HTTP request on the local process (without sending reques
 ```
 
 
-JSONScript to create a resource and a child resource using basic HTTP endpoints (can be done in a single request):
+JSONScript to create a resource and a child resource using basic HTTP endpoints (short syntax):
 
 ```JSON
-{ "$exec": "router",
-  "$method": "POST",
-  "$args":
+{ "$Router.post(":
   { "url": "/child_resource",
     "body":
     { "name": "My child resource",
       "resource_id":
-      { "$exec": "router",
-        "$method": "POST",
-        "$args":
+      { "$Router.post(":
         { "url": "/resource",
           "body": { "name": "My resource" } } } } } }
 ```
 
-In the example above the result of the script execution is used as an argument for another script. The same can be achieved more elegantly (and is recommended) using sequential execution and reference (see below). The script above will return only the id of child resource, results of scripts in `$args` are not returned.
+In the example above the result of the script execution is used as an argument for another script. The same can be achieved more elegantly (and is recommended) using sequential execution and reference (see below). The script above will return only the id of child resource, results of scripts in arguments are not returned.
 
 
 Instruction to perform database access (dbjs here is some non-existent processor for database access from JSONScript):
 
 ```JSON
-{ "$exec": "dbjs",
-  "$method": "select",
-  "$args":
+{ "$Dbjs.select":
   { "table": "resources",
     "where": { "id": 1 } } }
 ```
@@ -134,10 +164,8 @@ Instruction to perform database access (dbjs here is some non-existent processor
 Instruction to execute bash script (e.g., to use on internal network):
 
 ```JSON
-{
-  "$exec": "bash",
-  "$method": "node",
-  "$args": [ "--harmony", "myapp.js" ] }
+{ "$Bash.node":
+  [ "--harmony", "myapp.js" ] }
 ```
 
 
@@ -146,10 +174,16 @@ Instruction to execute bash script (e.g., to use on internal network):
 Syntax:
 
 ```
+{ "$comment": <JSONScript> }
+```
+
+or
+
+```
 { "$/": <JSONScript> }
 ```
 
-Comments can be used inside JSONScript. To any object "$/" key can be added - it will be removed before execution. To any array the object `{ "$/": "comment" }` can be added. This object will be removed before execution, and it will not affect absolute or relative references (see below). If the comment is <JSONScript> it won't be executed or even parsed. It allows easily commenting out blocks of code in the script.
+Comments can be used inside JSONScript. To any object "$/" key can be added - it will be removed before execution. To any array the object `{ "$/": "comment" }` can be added. This object will be removed before execution, and it will be not included in the length of array and will not affect indeces of other array elements. If the comment is <JSONScript> it won't be executed or even parsed/validated. It allows easily commenting out blocks of code in the script.
 
 
 ### Sequential execution
@@ -157,44 +191,54 @@ Comments can be used inside JSONScript. To any object "$/" key can be added - it
 Syntax:
 
 ```
-[ <JSONScript>,
+[ / { "$concurrency": <JSONScript:boolean|number> }, /
   <JSONScript>,
-  ... ]
+  <JSONScript>,
+  ...
+  / , { "$result": <JSONScript> } / ]
 ```
+
+/ ... / above means an optional element.
+
 
 Sequential execution is expressed as the array of execution steps. Each step should be a valid JSONScript script. It can be either a basic instruction or any other valid JSONScript execution construct (including array for sequential execution).
 
 Interpreter will ensure that the next step will start only after the previous step has completed.
 
-The result of sequential execution is the array of execution results from each step.
+If the first element in array is `$concurrency` instruction some or all instructions can be executed in parallel. `Number` means concurrency limit, `true` - all instruction will start in order without waiting for the previous instructions to complete, `false` is the default for sequential execution.
 
-The following execution steps can use the results of the previous steps as their arguments, as shown in the examples and in [References to the previous results].
+`$concurrency` instruction does not have to be the first array element, also there can be multiple concurrency instructions. Whenever it is used it will affect concurrency of the execution of the following steps in the array.
+
+The result of sequential execution is the array of execution results from each step, although it can be changed with `$result` instruction, that must be the last instruction in the array (see examples), or previous executed `$results` instruction.
+
+The following execution steps can use the results of the previous steps as their arguments, as shown in the examples.
 
 
 ##### Examples
 
-JSONScript to create a resource and a child resource using basic HTTP endpoints (can be done in a single request):
+JSONScript to create a resource and a child resource using basic HTTP endpoints (to do it in a single request):
 
 ```JSON
-[ { "$exec": "router",
-    "$method": "POST",
-    "$args":
-    { "url": "/resource",
-      "body": { "name": "My resource" } } },
-  { "$exec": "router",
-    "$method": "POST",
-    "$args":
+[ { "$res_id":
+    { "$Router.post(":
+      { "url": "/resource",
+        "body": { "name": "My resource" } } } },
+  { "$Router.post(":
     { "url": "/child_resource",
       "body":
       { "name": "My child resource",
-        "resource_id": { "$": -1 } } } } ]
+        "resource_id": { "$":"res_id" } } } } ]
 ```
 
-In this example `{ "$": -1 }` will be substituted with the result of the previous instruction execution. Instead of relative indeces, absolute indeces can also be used, with the first instruction in the list having the index of 0. So in this example `{ "$": 0 }` would mean the same.
+In this example `{ "$":"res_id" }` will be substituted with the result of the previous instruction execution.
 
-Also to refer to the result of the previous instruction { "$": "-" } can be used.
+Instead of using named reference, in this case the reference to the previous result can be used. Named reference make it clearer what is the meaning of the value.
 
-Results of previous sub-instructions and super-instructions can also be referred, as long as they were completed before the current step. See [References to the previous results].
+Results of previous sub-instructions and super-instructions can also be referred, as long as they were completed before the current step and the references to them were created.
+
+It is important to understand that `res_id` is not a varaible in the traditional meaning. It is a reference to the object where the script is located and when the script is executed and replaced with its result, `res_id` becomes the reference to the result of the script.
+
+See [References]() below for more details.
 
 
 ### Parallel execution
@@ -205,7 +249,8 @@ Syntax:
 { "<step_name>": <JSONScript>,
   "<step_name>": <JSONScript>,
   ...,
-  / "$concurrency": <JSONScript> / }
+  / , "$concurrency": <JSONScript> /
+  / , "$result": <JSONScript> / }
 ```
 
 / ... / above means an optional element.
@@ -213,15 +258,15 @@ Syntax:
 
 Parallel execution is expressed as the object with each key containing an execution step - see [Sequential execution] for details about execution steps.
 
-Each execution step has a name - its key in the object. This key can be a string starting from letter and containing letters, numbers and symbols "_" and "-".
+Each execution step has a name - its key in the object. This key should be a valid identifier - a string starting from lowercase letter and containing letters, numbers and symbols "_" and "-".
 
-Interpreter will not wait for the results of any steps in the object to start executing other steps, as long as this steps do not refer to the results of other steps (see below), although a special key `$concurrency` can be used to limit the maximum number of steps executing in parallel. Interpreter should also allow setting the default maximum concurrency used if this key is not present.
+Interpreter will not wait for the completion of any steps in the object to start executing other steps, as long as this steps do not refer to the results of other steps (see below), although a special key `$concurrency` can be used to limit the maximum number of steps executing in parallel. Interpreter should also allow setting the default maximum concurrency that will be used if this key is absent.
 
 The implementation of parallel execution is determined by the implementation of the interpreter and the features available in the host language - it can use threads, fibers, event loops, etc.
 
 The result of parallel execution is the JSON object with the same keys containing the results of each keys.
 
-Execution steps in parallel execution can refer to the results of other steps in the same object and they can refer to the results of other instruction executed previously - see Examples and [References to the previous results].
+Execution steps in parallel execution can refer to the results of other steps in the same object and they can refer to the results of other instructions executed previously - see Examples and [References]. If that is the case, the step will wait for the completion of the step which result it needs.
 
 If steps do not use results of other steps, the order in which execution steps are started is not defined and can be different every time the script is called. It is wrong to assume that the order of starting parallel tasks will be the same as the order of keys in JSON.
 
@@ -232,14 +277,10 @@ Request two resources in parallel:
 
 ```JSON
 { "1": 
-  { "$exec": "router",
-    "$method": "GET",
-    "$args":
+  { "$Router.get(":
     { "url": "/resource/1" } },
   "2":
-  { "$exec": "router",
-    "$method": "GET",
-    "$args":
+  { "$Router.get(":
     { "url": "/resource/2" } } }
 ```
 
@@ -247,45 +288,91 @@ Request two records:
 
 ```JSON
 { "1": 
-  { "$exec": "dbjs",
-    "$method": "select",
-    "$args":
+  { "$Dbjs.select":
     { "table": "users",
       "where": { "id": 1 } } },
   "2": 
-  { "$exec": "dbjs",
-    "$method": "select",
-    "$args":
+  { "$Dbjs.select":
     { "table": "documents",
       "where": { "id": 23 } } }
 ```
 
-It can be argued that the same can be achieved using SQL, but it is less safe exposing SQL that a limited commands set all of which are safe. As long as only safe commands are exposed to interpreter, the whole script is also safe.
+It can be argued that the same can be achieved using SQL, but it is less safe exposing SQL than a limited commands set all of which are safe. As long as only safe commands are exposed to interpreter, the whole script is also safe.
 
 
 Request post with title "My post" and all comments:
 
 ```JSON
 { "post": 
-  { "$exec": "router",
-    "$method": "GET",
-    "$args":
+  { "$Router.get(":
     { "url": "/post" }
     { "qs": 
       { "title": "My post",
         "limit": 1 } } },
   "comments":
-  { "$exec": "router",
-    "$method": "GET",
-    "$args":
+  { "$Router.get(":
     { "$/": "get all comments for post_id",
       "url": "/comments/:post_id",
-      "params": { "post_id": { "$": "post.id" } } } } }
+      "params": { "post_id": { "$":"post.id" } } } } }
 ```
 
-Although parallel execution construct is used in the example above, it will be executed sequentially, as the result of the first step is used in the arguments of the second step. `{ "$": "post.id" }` returns the property `id` of the post returned by the first instruction.
+Although parallel execution construct is used in the example above, it will be executed sequentially, as the result of the first step is used in the arguments of the second step. `{ "$":"post.id" }` returns the property `id` of the post returned by the first instruction.
 
-Interpreter should try to detect any possible circular references as early as possible before executing any steps, in which case the construct will throw an exception CIRCULAR_REFERENCE. Because "$" value can be another script, it may require some processing to be done before the circular reference is detected.
+Interpreter should try to detect any possible circular references as early as possible before executing any steps, in which case the construct will throw an exception CIRCULAR_DEPENDENCY. Because "$" value can be another script, it may require some processing to be done before the circular dependency is detected.
+
+
+### References
+
+Syntax:
+
+Creating reference:
+
+```
+{ "$reference": <JSONScript:string:reference>,
+  "$value": <JSONScript> }
+```
+
+or
+
+```
+{ "$<reference>": <JSONScript> }
+```
+
+Using reference:
+
+```
+{ "$reference": <JSONScript:string:reference> }
+```
+
+or
+
+```
+{ "$": <JSONScript:string:reference> }
+```
+
+Assigning new value (or script) to the reference:
+
+```
+{ "$reference": <JSONScript:string:reference_name>,
+  "$set": <JSONScript> }
+```
+
+or
+
+```
+{ "$<reference_name>=": <JSONScript> }
+```
+
+Using full syntax for declaring and assigning the reference allows to compute its name, in most cases the name is known in advance and the short syntax can be used.
+
+<reference_name> name should be a valid identifier and cannot be the same as any reserved word (see [Reserved words]()).
+
+References in JSONScript cannot be redeclared - it will be a run time error. But references can be re-assigned both before and after script execution.
+
+Re-assigning them after execution will replace the data. Re-assigning before execution allows both to prevent any execution by putting data in its place and to change the script (`$script` instruction should be used for it).
+
+There is a special reference referring to the previously executed instruction:
+`{ "$":"$" }`. It can be used to avoid creating named references if it is going to be used in the next instruction only once.
 
 
 ### Calculations
@@ -293,23 +380,22 @@ Interpreter should try to detect any possible circular references as early as po
 Syntax:
 
 ```JSON
-{ "$calc": <JSONScript>,
-  "$args": <JSONScript> }
+{ "$calc": <JSONScript:string:operation>,
+  "$args": <JSONScript:array:arguments> }
 ```
 
-Tecnically it is just a syntax sugar for `$exec`, where `$calc` processor supplied by the interpreter is used.
-
-`$calc` - operation to be called. Can be "+", "-", etc. (or a script returning such string) or standard Math functions. See [Operations]
-
-`$args` - operands to which the operation is applied. TODO objects/arrays
-
-Short syntax for basic operations is also supported (and recommended):
+or
 
 ```JSON
-{ "$<op>": <JSONScript> }
+{ "$<operation>": <JSONScript> }
 ```
 
-where <op> can be +, -, *, /, etc. (see [Operations])
+where <operation> can be +, -, *, /, etc. (see [Operations]()).
+
+
+`$calc` - operation to be called (or a script returning operation as a string).
+
+`$args` - single operand or array of operands to which the operation is applied (depends on the operation).
 
 
 Examples:
@@ -324,19 +410,63 @@ Syntax:
 Define function:
 
 ```
-{ "$func": <JSONScript>,
-  "$args": <JSONScript>,
-  "do": <JSONScript> }
+{ "$def": <JSONScript:string:function_name>,
+  "$args": <JSONScript:array|object:args_names|args_names:types>,
+  "$func": <JSONScript> }
 ```
+
+or
+
+```
+{ "$<function_name>": <JSONScript:array|object:args_names|args_names:types>,
+  "$func": <JSONScript> }
+
 
 Call function:
 
 ```
-{ "$call": <JSONScript>,
+{ "$call": <JSONScript:>,
   "$args": <JSONScript> }
 ```
 
-TODO
+or
+
+```
+{ "$<function_reference>(": <JSONScript: array|object: args_list|args_by_name> }
+```
+
+Full syntax allows to compute the function name. Arguments in the function declaration can be either array of argument names (both the array and each name can be computed) or the object where the key is the argument name and the value is the allowed argument type (in a string, can be "number", "string", "boolean", "object", "array", "function"). If the value is an empty string, the value of any type can be passed. In all cases null can be passed (or argument can be omitted, which is equivaluent to passing null), unless "!" is added to the type in which case the argument is required.
+
+When calling a function that was decraled with the list of arguments in array, either an object or an array can be used to pass arguments (both the whole array/object or each argument can be computed). In case array is used, the arguments will be matched to their names by order. In case the object is used, the arguments will be matched by name. No type checking will be performed and all arguments are optional.
+
+When calling a function that was declared with the arguments names and possibly types in an object, only the object can be used to pass arguments. The arguments will be matched by name (as objects have no order) and the type checking will be done if the types were provided in the function declaration. If the types do not match, the exception ARGUMENT_TYPE_ERROR will be thrown.
+
+In both array and object syntax of passing argument in the function call, additional arguments can be passed. All the arguments will be available in the $arguments reference which is both the array and object, as the arguments can be accessed by their indices (if the array syntax of passing was used or is the function was declared with arguments list in array and the argument is present in the declaration) and by their keys (if object was used to pass the arguments or if the argument name is present in the function declaration).
+
+#### Function scopes
+
+Function creates its own scope. References declared inside the function are not accssible from the outside. Using the same name as existing outside reference is allowed and it will make an outside reference unavailable inside the function.
+
+Function scope can be accessed using `{ "$": "scope" }`. "scope" is a reserved word that cannot be used as a reference (or function) name. If there is a reference called "a" inside the scope it can be accessed as `{ "$": "scope.a" }`.
+
+Parent scope is the scope property of the scope object, `{ "$": "scope.scope" }`.
+
+Global scope (the scope of the script) can be accessed using a reserved reference `{ "$": "global" }` and the references defined in the global scope are the properties of "global" reference. See [Accessing properties and array elements]().
+
+
+#### Functions as references
+
+Function name is also a reference to its declaration. That allows to assign a completely different function to the same name (using `$script` instruction) or to replace it with the data (in which case it will be the part of the script result) so no furhter function call will be possible (it will throw REFERENCE_IS_NOT_FUNCTION exception).
+
+
+#### Functions as values and closures
+
+Function can be declared inside the function, it can be passed as an argument value and returned as the function result (using `$return` instruction).
+
+If the function is a closure (it uses references from outside scope), they will be available even if the containing function finished execution. Every time the closure is created, it will have its own copy of the scope references.
+
+
+TODO Examples
 
 
 ### Control flow
@@ -346,13 +476,13 @@ JSONScript supports control flow instructions that affect the order of excution 
 All control frow constructs are objects with some special key starting from "$".
 
 
-#### $res, $return, $end - creating results and terminating script execution
+#### $result, $return, $end - creating results and terminating script execution
 
 There are three keys that would create result, return value from the current function or completely terminate the script:
 
-- `$res` - defines the result of the current execution construct (array or object). It will also create the return value of the function or of the whole script but only if its containing construct is the last construct executed in the function or the current script. See [Functions]. It is the most recommended instruction to use, as it doesn't break the flow of the script.
+- `$result` - defines the result of the current execution construct (array or object). It will also create the return value of the function or of the whole script but only if its containing construct is the last construct executed in the function or the current script. See [Functions]. It is the most recommended instruction to use, as it doesn't break the flow of the script.
 
-- `$return` - in addition to defining the result as `$res` does it also exits the currently executed function. Using `$return` outside of function is a syntax error.
+- `$return` - in addition to defining the result as `$res` does it also exits the currently executed function. Using `$return` outside of a function is a syntax error.
 
 - `$end` - defines the result and terminates the whole script execution. In most cases, this instruction is not needed and not recommended.
 
@@ -360,7 +490,7 @@ There are three keys that would create result, return value from the current fun
 Syntax:
 
 ```
-{ "$res": <JSONScript> }
+{ "$result": <JSONScript> }
 
 { "$return": <JSONScript> }
 
@@ -369,9 +499,9 @@ Syntax:
 
 In some cases you may only want the result of the last step in sequential execution returned as a script result.
 
-It can be done using `$res` instruction, that is an object with the single `$res` key. The value of the key will be the result of the script execution. As everything, the key can be any valid JSONScript - scalar, data, or the script which result will be the result of the containing block, script (or function) execution.
+It can be done using `$result` instruction, that is an object with the single `$result` key. The value of the key will be the result of the script execution. As everything, the key can be any valid JSONScript - scalar, data, or the script which result will be the result of the containing block, script (or function) execution.
 
-Although it is possible to always use `$res` to explicitly declare the results, it is not idiomatic and not recommended, as it would require additional processing from the interpreter.
+Although it is possible to always use `$result` to explicitly declare the results, it is not idiomatic and not recommended, as it complicates the script.
 
 
 Exapmle:
@@ -380,92 +510,79 @@ Add the comment to the post with the title "My post":
 
 ```JSON
 [ { "post": 
-    { "$exec": "router",
-      "$method": "GET",
-      "$args":
+    { "Router.get(":
       { "url": "/post" }
       { "qs": 
         { "title": "My post",
           "limit": 1 } } },
     "comment":
-    { "$exec": "router",
-      "$method": "POST",
-      "$args":
+    { "$Router.post(":
       { "url": "/comments/:post_id",
-        "params": { "post_id": { "$": "post.id" } },
+        "params": { "post_id": { "$":"post.id" } },
         "body": { "text": "My comment" } } } },
-  { "$res": { "$": "-.comment" } } ]
+  { "$result": { "$": "$.comment" } } ]
 ```
 
-In the example above the result of `{ "$": "-.comment" }` is the result of substep "comment" in the previous step. `{ "$": "0.comment" }` would return the same, but the former is idiomatic and recommended as it allows adding additional steps in the beginning without changing the `$end` instruction.
+In the example above the result of `{ "$": "$.comment" }` is the result of substep "comment" in the previous step.
 
-Without the end instruction the post would also be returned, which is a waste in case the client doesn't need it.
+Without the `$result` instruction the post would also be returned, which is a waste in case the client doesn't need it.
 
 
-### $map and $reduce - iteration and mapping constructs
+### Collections
+
+There are the following instruction that can be used both with arrays and objects: each, map, reduce, filter, some, every, find.
+
+With arrays additionally these instructions can be used: push, pop, shift, unshift, slice, splice, reverse, sort, indexOf.
+
+These methods accept collection as the first argument and the function (or function reference) that will be called for each item in collection as the second argument.
 
 Syntax:
 
 ```
-{ "$map": <JSONScript>,
-  / "$as": <JSONScript>, /
-  "$do": <JSONScript>,
-  / "$concurrency": <JSONScript> / }
-
-{ "$reduce": <JSONScript>,
-  / "$as": <JSONScript>, /
-  / "$seed": <JSONScript>, /
-  "$do": <JSONScript> }
+{ "$_.<method>(":
+  [ <Collection>,
+    <JSONScript:function_definition|function_reference>
+    / , <concurrency> / ] }
 ```
 
-/ ... / above means optional elements.
 
+The iteration constructs allows to call function passing each element of the previous data structure (or script result) as an argument. `$reduce` is executed sequentially as each step can refer to the result of the previous step. When object is itereated, the order is undefined, it is wrong to assume that it will the same as order of keys in JSON.
 
-The `$map` and `$reduce` constructs allows to call another script passing each element of the previous data structure (or script result) as an argument. `$reduce` is executed sequentially as each step can refer to the result of the previous step. When object is itereated, the order is undefined, it is wrong to assume that it will the same as order of keys in JSON.
-
-`$map` or `$reduce` - data structure or the result of another script to iterate, can be object or array
-
-`$do` - the script that will be executed with each element of the structure in `$map`.
-
-`$as` - the reference name to use in arguments in the script in `$do`. It as usually a string, but can be a script returning the string, as anything else. If `$as` key is not specified, the iteration item value can be referred to as { "$": "~" }. It is recommended in simple cases. But in complex cases giving a name to the iteration reference can add clarity. Index (or key) of the iteration item can be referred to as { "$": "#" }. There is no special syntax for it as it is not needed in most cases.
-
-`$seed` - can be used in `$reduce` construct. It is the initial value of accumulator for reduce operation. Inside `$do` script the value of accumulator can be used as the argument and can be referred to with { "$": "=" }. If the `$seed` is not specified, the first item in `$reduce` key will be used as seed; and for the first item `$do` script will NOT be executed.
-
-`$concurrency` - can be used used in `$map` construct. It prevents concurrency or specifies the maximum number of steps that can be executed in parallel. If `$concurrency` key is not specified, arrays and objects in `$map` keys are iterated in parallel. `$concurrency: false` prevents concurrency completely. `$concurrency: <number>` limits the number of parallel tasks. The value for `$concurrency` can also be the result of JSONScript script.
+<concurrency> - can be used used in `map` method. It prevents concurrency or specifies the maximum number of steps that can be executed in parallel. If `$concurrency` key is not specified, arrays and objects in `$map` keys are iterated in parallel. `concurrency` equal to `false` prevents concurrency completely. `<number>` limits the number of parallel tasks. The value for `concurrency` can also be the result of JSONScript script.
 
 Examples:
 
 1. Request 10 latest posts of a given user together with comments
 
 ```JSON
-[ [ { "$func": "getPosts",
-      "$args": [ "user_id", "limit" ],
-      "$do":
-      { "$exec": "router",
-        "$method": "GET",
-        "$args":
-        { "url": "/post" }
-        { "qs": 
-          { "user_id": { "$": "user_id" },
-            "limit": { "$": "limit" } } } } },
-    { "$func": "getComments",
-      "$args": "post",
-      "$do":
-      { "$exec": "router",
-        "$method": "GET",
-        "$args":
+[ [ { "$getPosts": [ "user_id", "limit" ],
+      "$func":
+      { "$Router.get": 
+        { { "url": "/post" }
+          { "qs": 
+            { "user_id": { "$":"user_id" },
+              "limit": { "$":"limit" } } } } } },
+    { "$getComments": "post",
+      "$func":
+      { "$Router.get":
         { "url": "/comments/:post_id",
-          "params": { "post_id": { "$": "post.id" } } } } } ],
-  { "$map":
-    { "$call": "getPosts",
-      "$args": [ 37, 10 ] },
-    "$do":
-    [ { "$call": "getComments",
-        "$args$": "~" },
-      { "$res": 
-        { "post": { "$": "~" },
-          "comments": { "$": "-" } } } ] },
-  { "$res$": "-" } ]
+          "params": { "post_id": { "$":"post.id" } } } } } ],
+  { "$data=":
+    { "$map":
+      [ { "$getPosts(": [ 37, 10 ] },
+        { "$": ["post"],
+          "$func":
+          [ { "$comments=": { "$getComments(": { "$": "post" } },
+            { "$res": 
+              { "post": {"$":"post"},
+                "comments": {"$":"comments"} } } } ] } ]
+      "$as": "post"
+      "$do":
+      [ { "$comments=": { "$getComments(": { "$": "post" } },
+        { "$res": 
+          { "post": {"$":"post"},
+            "comments": {"$":"comments"} } } } ] },
+  { "$result": {"$":"data"} ]
 ```
 
 The example above will iterate the list of posts for the specified user, up to 10 posts (as should be defined in `router`), and request the list of comments for each post. `$res` instruction is used to include both the post and the coments in the result; without it the result would be the array of arrays, with internal arrays containing comments.

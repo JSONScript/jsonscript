@@ -710,7 +710,49 @@ Check in the log the last resource changed and return this resource and its chil
   { "$result": "$" } ]
 ```
 
-### $try, $catch, $finally and `$throw` -  exceptions and exception handling
+
+### Loops - `$while`, `$for`, `$break`, `$continue`.
+
+Syntax:
+
+While loop
+
+```
+{ $while: <JSONScript>, $do: <JSONScript> }
+```
+
+For loop (macro):
+
+```
+{ $for: <JSONScript:array:for_clauses>, $do: <JSONScript> }
+```
+
+<for_clauses> syntax:
+
+```
+[<JS:initialization>, <JS:condition>, <JS:increment>]
+```
+
+
+```
+{ $for: '<reference_name>', $in: <JSONScript:object|array>, $do: <JS> }
+```
+
+```
+{ $for: '<reference_name>', $of: <JSONScript:object|array>, $do: <JS> }
+```
+
+
+```
+'$break'
+```
+
+```
+'$continue'
+```
+
+
+### Exceptions and exception handling - $try, $catch, $finally and `$throw`
 
 Syntax:
 

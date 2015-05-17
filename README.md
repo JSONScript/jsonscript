@@ -360,7 +360,12 @@ There is a special reference referring to the previously executed instruction:
 `{ "$get":"$" }` or `"$"`. It can be used to avoid creating named references if it is going to be sed in he next instruction only once and makes chaining instructions more convenient.
 
 
-## Calculatios
+### Object property and array elements access
+
+TODO
+
+
+### Calculatios
 
 Syntax:
 
@@ -887,4 +892,27 @@ Map macro
             $then: { $code: ['%val', '%index'] },
             $else: { $code: ['%val'] } } },
         $func: '%body' } ] } }
+```
+
+
+### Reserved words
+
+JSONScript reserves all the words that are reserved in JavaScript ES6, ES7 and those that were reserved in the previous version of JavaScript for future use.
+
+Although many of these reserved words are not currently used, they cannot be used for references. They can be used though for property names.
+
+```
+break, case, class, catch, const, continue, debugger, default, delete, do, else, export, extends, finally, for, function, if, import, in, instanceof, let, new, of, return, super, switch, this, throw, try, typeof, var, void, while, with, yield
+
+enum, await
+
+implements, module, package, protected, static, interface, private, public
+
+abstract, boolean, byte, char, double, final, float, goto, int, long, native, short, synchronized, transient, volatile
+```
+
+In addition there are these reserved words currently used:
+
+```
+args, call, code, def, do, end, eval, exec, func, get, global, macro, method, result, scope, script, set
 ```

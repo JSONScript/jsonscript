@@ -59,14 +59,6 @@ As the script executes, each instruction returns some data. By default this data
 There is the instruction `$result` that changes which results will be stored after executing certain instructions.
 
 
-## TODO: Improvements to the current version
-
-- remove relative references, use only named references, $scope and $root reserved for the current scope and the root of the script.
-
-
-- For $script add $sandbox option. $sandbox: false to prevent access to outside symbols, root and scope. Essentially, script will execute in its own scope with no access to the outside scope. $sandbox: [ "$scope", "$a" ] will only allow access to certain symbols ($scope should not allow $scope.$scope meaning traversing up the scope tree).
-
-
 ## Language
 
 JSONScript uses JSON format to express the script.
@@ -413,6 +405,13 @@ or short (macro):
 ```
 { "$<function_name>": <JSONScript:array|object:args_names|args_names:types>,
   "$func": <JSONScript> }
+```
+
+or anonymous arrow syntax (macro):
+
+```
+{ "$<arg_name>=>": <JSONScript> }
+```
 
 
 Call function:
@@ -511,12 +510,12 @@ Add the comment to the post with the title "My post":
     "comment":
     { "$Router.post()":
       { "url": "/comments/:post_id",
-        "params": { "post_id": { "$":"post.id" } },
+        "params": { "post_id": "$post.id" },
         "body": { "text": "My comment" } } } },
-  { "$result": { "$": "$.comment" } } ]
+  { "$result": "$.comment" } ]
 ```
 
-In the example above the result of `{ "$": "$.comment" }` is the result of substep "comment" in the previous step.
+In the example above the result of `"$.comment"` is the result of substep "comment" in the previous step.
 
 Without the `$result` instruction the post would also be returned, which is a waste in case the client doesn't need it.
 
@@ -553,20 +552,19 @@ Examples:
     { "$Router.get()": 
       { "url": "/post"
         "qs": 
-        { "user_id": { "$":"user_id" },
-          "limit": { "$":"limit" } } } } },
+        { "user_id": "$user_id",
+          "limit": "$limit" } } } },
   { "$getComments": ["post"],
     "$func":
     { "$Router.get()":
       { "url": "/comments/:post_id",
-        "params": { "post_id": { "$":"post.id" } } } } },
+        "params": { "post_id": "$post.id" } } } },
   { "$_.map()":
     [ { "$getPosts": [ 37, 10 ] },
-      { "$": ["post"],
-        "$func":
-        { "post": {"$":"post"},
-          "comments": { "$getComments()": [ { "$": "post" } ] } } } ] },
-  { "$result": {"$":"$"} } ]
+      { "$post =>":
+        { "post": "$post",
+          "comments": { "$getComments()": ["$post"] } } } ] },
+  { "$result": "$" } ]
 ```
 
 The example above will iterate the list of posts for the specified user, up to 10 posts (as should be defined in `router`), and request the list of comments for each post. `$result` instruction is used to include both the post and the coments in the result; without it the result would be the array of arrays, with internal arrays containing comments.
@@ -581,14 +579,14 @@ With the concurrency limit (requested from executor "options" that could have be
 ```JSON
 [ "<functions from the example above>",
   { "$_.map()":
-    [ { "$getPosts()": [ 37, 10 ] },
+    [ { "$getPosts()": [37, 10] },
       { "$": [ "post" ],
         "$func":
-        { "post": { "$":"post" },
+        { "post": "$post",
           "comments":
-          { "$getComments()": { "$":"post" } } } },
+          { "$getComments()": ["$post"] } } },
       { "concurrency": { "$Options.get()": "concurrency" } } ] },
-  { "$result": {"$":"$"} } ]
+  { "$result": "$" } ]
 ```
 
 This example is just to show that any JSONScript can be used for any value. It is more likely that concurency won't be passed in the script at all and instead supplied as an option to the interpreter by the host environment/application. Although there may be situation when the client can supply the requered concurrency that would affect the price of execution by some 3rd party api.
@@ -602,7 +600,7 @@ The functions declarations are not included in the script, although they should 
 ```JSON
 [ <functions from the example above>,
   { "$_.reduce()":
-    [ { "$getPosts()": [ 37, 10 ] },
+    [ { "$getPosts()": [37, 10] },
       { "$": [ "charsCount", "post" ],
         "$func":
         [ { "$getComments()": "$post" },
@@ -623,11 +621,11 @@ The script below count the number of comments in the last 10 posts of the user:
 [ "<functions from the example above>",
   { "$+":
     { "$_.map()":
-      [ { "$getPosts()": [ 37, 10 ] },
+      [ { "$getPosts()": [37, 10] },
         { "$": "post",
           "$func":
           { "$_.length()":
-            { "$getComments()": "$post" } } } ] } },
+            { "$getComments()": ["$post"] } } } ] } },
   { "$result": "$" } ]
 ```
 
@@ -677,58 +675,40 @@ Examples:
 Check in the log the last resource changed and return this resource and its child resources:
 
 ```JSON
-[ { "$func": "getResourceAndChild",
-    "$args": [ "resName", "resId", "subResName" ],
-    "$do":
+[ { "$getResourceAndChild": [ "resName", "resId", "subResName" ],
+    "$func":
     { "$object":
-      [ { "key": { "$": "resName" },
+      [ { "key": "$resName",
           "value":
-          { "$exec": "resource",
-            "$method": "read",
-            "$args":
-            { "resource": { "$": "resName" },
-              "id": { "$": "resId" } } } },
-        { "key": { "$": "subResName" },
+          { "$Resource.read()":
+            { "resource": "$resName",
+              "id": "$resId" } } },
+        { "key": "$subResName",
           "value":
-          { "$exec": "resource",
-            "$method": "read",
-            "$args":
-            { "resource": { "$": "subResName" },
+          { "$Resource.read()":
+            { "resource": "$subResName",
               "where":
-              { "parentId": { "$": "resId" } } } } } ] },
+              { "parentId": "$resId" } } } } ] },
 
-  { "$exec": "resource",
-    "$method": "list",
-    "$args":
+  { "$Resource.list()":
     { "resource": "log",
       "order": "desc",
       "limit": 1 } },
 
-  { "$def": "lastLog", "$$": "-[0]" },
-  { "$def": "lastResId", "$$": "lastLog.resourceId" },
+  { "$lastLog": "$[0]" },
+  { "$lastResId": "$lastLog.resourceId" },
 
-  { "$switch": { "$": "lastLog.resourceName" },
+  { "$switch": { "$lastLog.resourceName" },
     "$cases":
     { "A":
-      { "$call": "getResourceAndChild",
-        "$args": [ "A", { "$": "lastResId" }, "childOfA" ] },
+      { "$getResourceAndChild()":
+        ["A", "$lastResId", "childOfA"] },
       "B":
-      { "$call": "getResourceAndChild",
-        "$args": [ "B", { "$": "lastResId" }, "childOfB" ] } } },
+      { "$getResourceAndChild()":
+        ["B", "$lastResId", "childOfB"] } } },
 
-  { "$res$": "-" } ]
+  { "$result": "$" } ]
 ```
-
-TODO transformations (`$object` and `$array`).
-TODO named references `$def`, `$` and `$$`
-TODO `$get` and `$set`
-
-`{ "$def": "lastLog", "$$": "-[0]" }` is a simplified syntax for `{ "$def": "lastLog", "$": { "$": "-[0]" } }`.
-
-Instead of `{ "$": "lastResId" }` can be used a relative reference `{ "$": "^-3[0].resourceId" }` or an absolute reference `{ "$": "/1[0].resourceId" }`
-
-See [References].
-
 
 ### $try, $catch, $finally and `$throw` -  exceptions and exception handling
 
@@ -738,8 +718,8 @@ Syntax:
 { "$throw": <JSONScript> }
 
 { "$try": <JSONScript>,
-  "$catch": <JSONScript>,
-  "$finally" <JSONScript> }
+  "$catch": <JSONScript>
+  / , "$finally" <JSONScript> / }
 ```
 
 `$try` - script in this key is executed first.
@@ -749,13 +729,17 @@ Syntax:
 `$finally` - this script will be executed in all cases, after `$catch`, if the exception was thrown, or after `$try` if there was no exception. You can refer to the results of "$try" and "$catch" using `{ "$": "$try" }` and `{ "$": "$catch" }`. `{ "$": "-" }` will refer to the previously executed block (`$try` or `$catch`).
 
 
+TODO: examples
+
+
 ### $script - scripts returning scripts
 
 Syntax:
 
 ```
-{ "$script": <JSONScript>,
-  / "$recur": <JSONScript> / }
+{ "$script": <JSONScript>
+  / , "$recur": <JSONScript> /
+  / , "$sandbox": <JSONScript> / }
 ```
 
 <JSONScript> will be executed. If the result is data (i.e., JSON that has no keys starting with "$") it will be the result of `$script` construct. If the result is JSONScript, it will be executed again.
@@ -766,26 +750,17 @@ Without `$recur` it will continue until the script result is data.
 
 `$recur: <number>` limits the recursion to a specified number of times.
 
-
-### $def - defining named references, modifying the results and changing the JSONScript in functions, iteration blocks and the one that was not processed yet.
-
-Syntax:
-
-```
-{ "$def": <JSONScript>,
-  "$": <JSONScript> }
-
-{ "$def": <JSONScript>,
-  "$$": <JSONScript> }
+`$sandbox: true` to prevent access to outside symbols, root and scope. Essentially, script will execute in its own scope with no access to the outside scope. $sandbox: [ "$scope", "$a" ] will only allow access to certain symbols ($scope should not allow $scope.$scope to avoid traversing up the scope tree). The default value is `false`.
 
 
-`$def` - the reference. Can be the name of the refence (as in the example above), an absolute or relative reference.
+### Transformations: `$object` and `$array`
 
-`$` - the value that the reference will point to. This value can be either data or script. If the reference points to the script that wasn't executed it, it will change it and the new script will be executed (or if the data is assigned, this data will be used as result of the replaced construct). If the reference points to the function, it will be changed - the changed script will be executed the next time the function is called. You can even change the function name in this way.
-
-`$$` - As shown above, this is the equivalent of using the value of reference `{ "$": <JSONScript> }` as the value of the defined reference. If `$def` defines or redefines the named reference, it will point to the same data as the reference in `$$`. If `$def` overwrites an absolute or relative reference to the script, the value from `$$` will be copied by value (deep-cloned).
+TODO
 
 
+### Script evaluation vs "quoting": `$eval` and `$code`
+
+TODO
 
 
 ### Macros

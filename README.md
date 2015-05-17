@@ -54,24 +54,17 @@ At the same time JSONScript allows keeping the remote system completely secure a
 
 ## Script execution
 
-As the script executes, each instruction returns some data. By default this data replaces the script itself and all results will be available to the interpreter to pass back to the host system that requested execution. Host system usually sends results back to the client, but can do anything else with them, e.g. logging, storing to the database, etc.)
+As the script executes, each instruction returns some data. By default this data replaces the script itself and all results will be available to the interpreter to pass back to the host system that requested execution. Host system usually sends results back to the client, but can do anything else with them, e.g. logging, storing to the database, etc.).
 
-There are instructions `$result` and `$results` that change which results will be stored after executing certain instructions.
+There is the instruction `$result` that changes which results will be stored after executing certain instructions.
 
 
 ## TODO: Improvements to the current version
 
 - remove relative references, use only named references, $scope and $root reserved for the current scope and the root of the script.
 
-- allow using user defined symbols in keys - it would make scripts more conscise.
-e.g. use { $<funcName>: <JSONScript:params> } instead of { $call: <JSONScript:funcName>, $args: <params> }. Maybe keep $call syntax as well to support computed names. Maybe require that function names start from lowercase letters and executors from capital letters, so { $<Executor>: "<method>", $args: <JSONScript > } could be used. Or even { "$Executor.method": <JSONScript:params> }.  Or maybe for executors $exec is a good idea... Or maybe keep both ways to allow for computed executors names and methods.
-Also to create a named reference simply { $<reference>: <JSONScript > } (but maybe keep computed reference names as well with the existing syntax)
 
 - For $script add $sandbox option. $sandbox: false to prevent access to outside symbols, root and scope. Essentially, script will execute in its own scope with no access to the outside scope. $sandbox: [ "$scope", "$a" ] will only allow access to certain symbols ($scope should not allow $scope.$scope meaning traversing up the scope tree).
-
-- { $get: <JSONScript$reference> } and { $set: <JSONScript:$reference>, $value: <JSONScript>} to get and overwrite JSON tree. In this way $set may replace $res (result). Or maybe $result should still be used... Remove { $: "ref" }? or maybe keep it. So { $a: 5 } to define and { $:"a" } to get and maybe { "$a=": 7 } to set. In which case { "$a=$": "b" } makes sense. In this case { "$a$": "b"} is not needed as it would simply create another reference to the same point in tree.
-
-- { $def: <funcName>, $args: <argumentsNames>, $func: <JSONScript>}. or { <$funcName>: <argumentsNames>, "$func": <JSONScript> }. In which case to call { <$funcName>: <arguments> } or  { $call: <funcName>, $args: <arguments> }
 
 
 ## Language
@@ -80,9 +73,9 @@ JSONScript uses JSON format to express the script.
 
 A valid JSONScript script can be an object or an array.
 
-JSON data is a valid JSONScript as long as none of the objects keys use $ as the first symbol. If you need to use JSON data with the key starting with "$", it can be escaped with "\": `{ "\$exec": "name" }`. This "\" will be removed from data by JSONScript interpreter.
+JSON data is a valid JSONScript as long as none of the objects keys and values use "$" and "." as their first symbol. If you need to use JSON data with the key starting with "$" or ".", it can be escaped with "\": `{ "\$exec": "name" }`. This "\" will be removed from data by JSONScript interpreter.
 
-Keys starting from "$" mean either JSONScript coomands or some variable/function/executor names.
+Keys starting from "$" mean JSONScript commands or some variable/function/executor names.
 
 If there is no execution instructions in JSONScript ( no keys starting with "$"), it will return the same JSON as the result.
 
@@ -97,10 +90,10 @@ Syntax:
   "$args": <JSONScript> }
 ```
 
-or
+or short (uses macro):
 
 ```
-{"$<Executor>.<method>(": <JSONScript:arguments> }
+{"$<Executor>.<method>()": <JSONScript:arguments> }
 ```
 
 Executor should be registered with the interpreter before it can be used in the script. The name of the executor should be a valid identifier (first character is latin letter, others are letters, numbers, "_" and "-") with the first capital letter. First capital letter cannot be used in functions and variables in the script.
@@ -140,12 +133,12 @@ Instruction to execute HTTP request to update some resource with id=1 (full synt
 JSONScript to create a resource and a child resource using basic HTTP endpoints (short syntax):
 
 ```JSON
-{ "$Router.post(":
+{ "$Router.post()":
   { "url": "/child_resource",
     "body":
     { "name": "My child resource",
       "resource_id":
-      { "$Router.post(":
+      { "$Router.post()":
         { "url": "/resource",
           "body": { "name": "My resource" } } } } } }
 ```
@@ -220,14 +213,14 @@ JSONScript to create a resource and a child resource using basic HTTP endpoints 
 
 ```JSON
 [ { "$res_id":
-    { "$Router.post(":
+    { "$Router.post()":
       { "url": "/resource",
         "body": { "name": "My resource" } } } },
-  { "$Router.post(":
+  { "$Router.post()":
     { "url": "/child_resource",
       "body":
       { "name": "My child resource",
-        "resource_id": { "$":"res_id" } } } } ]
+        "resource_id": "$res_id" } } } ]
 ```
 
 In this example `{ "$":"res_id" }` will be substituted with the result of the previous instruction execution.
@@ -277,10 +270,10 @@ Request two resources in parallel:
 
 ```JSON
 { "1": 
-  { "$Router.get(":
+  { "$Router.get()":
     { "url": "/resource/1" } },
   "2":
-  { "$Router.get(":
+  { "$Router.get()":
     { "url": "/resource/2" } } }
 ```
 
@@ -304,16 +297,16 @@ Request post with title "My post" and all comments:
 
 ```JSON
 { "post": 
-  { "$Router.get(":
+  { "$Router.get()":
     { "url": "/post" }
     { "qs": 
       { "title": "My post",
         "limit": 1 } } },
   "comments":
-  { "$Router.get(":
+  { "$Router.get()":
     { "$/": "get all comments for post_id",
       "url": "/comments/:post_id",
-      "params": { "post_id": { "$":"post.id" } } } } }
+      "params": { "post_id": "$post.id" } } } }
 ```
 
 Although parallel execution construct is used in the example above, it will be executed sequentially, as the result of the first step is used in the arguments of the second step. `{ "$":"post.id" }` returns the property `id` of the post returned by the first instruction.
@@ -328,42 +321,42 @@ Syntax:
 Creating reference:
 
 ```
-{ "$reference": <JSONScript:string:reference>,
+{ "$def": <JSONScript:string:reference_name>,
   "$value": <JSONScript> }
 ```
 
-or
+or short (macro)
 
 ```
-{ "$<reference>": <JSONScript> }
+{ "$<reference_name>": <JSONScript> }
 ```
 
 Using reference:
 
 ```
-{ "$reference": <JSONScript:string:reference> }
+{ "$get": <JSONScript:string:reference_name> }
 ```
 
-or
+or short (macro)
 
 ```
-{ "$": <JSONScript:string:reference> }
-```
+"$<reference_name>"
+
 
 Assigning new value (or script) to the reference:
 
 ```
-{ "$reference": <JSONScript:string:reference_name>,
-  "$set": <JSONScript> }
+{ "$set": <JSONScript:string:reference_name>,
+  "$value": <JSONScript> }
 ```
 
-or
+or short (macro)
 
 ```
 { "$<reference_name>=": <JSONScript> }
 ```
 
-Using full syntax for declaring and assigning the reference allows to compute its name, in most cases the name is known in advance and the short syntax can be used.
+Using full syntax for declaring, using and assigning the reference allows to compute its name, in most cases the name is known in advance and the short syntax can be used.
 
 <reference_name> name should be a valid identifier and cannot be the same as any reserved word (see [Reserved words]()).
 
@@ -372,10 +365,10 @@ References in JSONScript cannot be redeclared - it will be a run time error. But
 Re-assigning them after execution will replace the data. Re-assigning before execution allows both to prevent any execution by putting data in its place and to change the script (`$script` instruction should be used for it).
 
 There is a special reference referring to the previously executed instruction:
-`{ "$":"$" }`. It can be used to avoid creating named references if it is going to be used in the next instruction only once.
+`{ "$get":"$" }` or `"$"`. It can be used to avoid creating named references if it is going to be sed in he next instruction only once and makes chaining instructions more convenient.
 
 
-### Calculations
+## Calculatios
 
 Syntax:
 
@@ -384,7 +377,7 @@ Syntax:
   "$args": <JSONScript:array:arguments> }
 ```
 
-or
+or short (macro)
 
 ```JSON
 { "$<operation>": <JSONScript> }
@@ -415,7 +408,7 @@ Define function:
   "$func": <JSONScript> }
 ```
 
-or
+or short (macro):
 
 ```
 { "$<function_name>": <JSONScript:array|object:args_names|args_names:types>,
@@ -429,10 +422,10 @@ Call function:
   "$args": <JSONScript> }
 ```
 
-or
+or short (macro)
 
 ```
-{ "$<function_reference>(": <JSONScript: array|object: args_list|args_by_name> }
+{ "$<function_reference>()": <JSONScript: array|object: args_list|args_by_name> }
 ```
 
 Full syntax allows to compute the function name. Arguments in the function declaration can be either array of argument names (both the array and each name can be computed) or the object where the key is the argument name and the value is the allowed argument type (in a string, can be "number", "string", "boolean", "object", "array", "function"). If the value is an empty string, the value of any type can be passed. In all cases null can be passed (or argument can be omitted, which is equivaluent to passing null), unless "!" is added to the type in which case the argument is required.
@@ -510,13 +503,13 @@ Add the comment to the post with the title "My post":
 
 ```JSON
 [ { "post": 
-    { "Router.get(":
+    { "Router.get()":
       { "url": "/post" }
       { "qs": 
         { "title": "My post",
           "limit": 1 } } },
     "comment":
-    { "$Router.post(":
+    { "$Router.post()":
       { "url": "/comments/:post_id",
         "params": { "post_id": { "$":"post.id" } },
         "body": { "text": "My comment" } } } },
@@ -539,81 +532,63 @@ These methods accept collection as the first argument and the function (or funct
 Syntax:
 
 ```
-{ "$_.<method>(":
+{ "$_.<method>()":
   [ <Collection>,
     <JSONScript:function_definition|function_reference>
-    / , <concurrency> / ] }
+    / , <options> / ] }
 ```
 
 
 The iteration constructs allows to call function passing each element of the previous data structure (or script result) as an argument. `$reduce` is executed sequentially as each step can refer to the result of the previous step. When object is itereated, the order is undefined, it is wrong to assume that it will the same as order of keys in JSON.
 
-<concurrency> - can be used used in `map` method. It prevents concurrency or specifies the maximum number of steps that can be executed in parallel. If `$concurrency` key is not specified, arrays and objects in `$map` keys are iterated in parallel. `concurrency` equal to `false` prevents concurrency completely. `<number>` limits the number of parallel tasks. The value for `concurrency` can also be the result of JSONScript script.
+`options.concurrency` - can be used used in `map` method. It prevents concurrency or specifies the maximum number of steps that can be executed in parallel. If `$concurrency` key is not specified, arrays and objects are iterated in parallel. `concurrency` equal to `false` prevents concurrency completely. `<number>` limits the number of parallel tasks. The value for `concurrency` can also be the result of JSONScript script.
 
 Examples:
 
 1. Request 10 latest posts of a given user together with comments
 
 ```JSON
-[ [ { "$getPosts": [ "user_id", "limit" ],
-      "$func":
-      { "$Router.get": 
-        { { "url": "/post" }
-          { "qs": 
-            { "user_id": { "$":"user_id" },
-              "limit": { "$":"limit" } } } } } },
-    { "$getComments": "post",
-      "$func":
-      { "$Router.get":
-        { "url": "/comments/:post_id",
-          "params": { "post_id": { "$":"post.id" } } } } } ],
-  { "$data=":
-    { "$map":
-      [ { "$getPosts(": [ 37, 10 ] },
-        { "$": ["post"],
-          "$func":
-          [ { "$comments=": { "$getComments(": { "$": "post" } },
-            { "$res": 
-              { "post": {"$":"post"},
-                "comments": {"$":"comments"} } } } ] } ]
-      "$as": "post"
-      "$do":
-      [ { "$comments=": { "$getComments(": { "$": "post" } },
-        { "$res": 
-          { "post": {"$":"post"},
-            "comments": {"$":"comments"} } } } ] },
-  { "$result": {"$":"data"} ]
+[ { "$getPosts": ["user_id", "limit"],
+    "$func":
+    { "$Router.get()": 
+      { "url": "/post"
+        "qs": 
+        { "user_id": { "$":"user_id" },
+          "limit": { "$":"limit" } } } } },
+  { "$getComments": ["post"],
+    "$func":
+    { "$Router.get()":
+      { "url": "/comments/:post_id",
+        "params": { "post_id": { "$":"post.id" } } } } },
+  { "$_.map()":
+    [ { "$getPosts": [ 37, 10 ] },
+      { "$": ["post"],
+        "$func":
+        { "post": {"$":"post"},
+          "comments": { "$getComments()": [ { "$": "post" } ] } } } ] },
+  { "$result": {"$":"$"} } ]
 ```
 
-The example above will iterate the list of posts for the specified user, up to 10 posts (as should be defined in `router`), and request the list of comments for each post. `$res` instruction is used to include both the post and the coments in the result; without it the result would be the array of arrays, with internal arrays containing comments.
+The example above will iterate the list of posts for the specified user, up to 10 posts (as should be defined in `router`), and request the list of comments for each post. `$result` instruction is used to include both the post and the coments in the result; without it the result would be the array of arrays, with internal arrays containing comments.
 
-`{ "$": "~" }` refers to the iteration value (the post), `{ "$": "-" }` refers to the result of the previous instruction in the array (the array of comments).
+`{ "$":"post" }` refers to the iteration value.
 
-`{ "$res$": "-" }` is a simplified (and recommended) syntax for `{ "$res": { "$": "-" } }` - the result using the reference to the previous item.
+`{ "$result": {"$":"$"} }` is the reference to the previous item.
 
-`"$args$": "~"` is a simplified syntax for `"$args": { "$": "~" }` - arguments using the reference to the iteration value.
 
-In general, adding "$" symbol after the key that expects value, converts it to the key that expects a reference. It can only be done with JSONScript keys that start with "$" but not with data keys.
-
-With named iteration value and the concurrency limit (requested from executor "options" that could have been supplied to the interpreter) the script could look like this:
+With the concurrency limit (requested from executor "options" that could have been supplied to the interpreter) the script will look like this:
 
 ```JSON
-[ <functions from the example above>,
-  { "$map":
-    { "$call": "getPosts",
-      "$args": [ 37, 10 ] },
-    "$as": "post"
-    "$do":
-    [ { "$call": "getComments",
-        "$args": { "$": "post" } },
-      { "$res": 
-        { "post": { "$": "post" },
-          "comments": { "$": "-" } } } ],
-    "$concurrency":
-    { "$exec": "options",
-      "$method": "get",
-      "$args": "concurrency" } },
-  { "$res$": "-" } ]
+[ "<functions from the example above>",
+  { "$_.map()":
+    [ { "$getPosts()": [ 37, 10 ] },
+      { "$": [ "post" ],
+        "$func":
+        { "post": { "$":"post" },
+          "comments":
+          { "$getComments()": { "$":"post" } } } },
+      { "concurrency": { "$Options.get()": "concurrency" } } ] },
+  { "$result": {"$":"$"} } ]
 ```
 
 This example is just to show that any JSONScript can be used for any value. It is more likely that concurency won't be passed in the script at all and instead supplied as an option to the interpreter by the host environment/application. Although there may be situation when the client can supply the requered concurrency that would affect the price of execution by some 3rd party api.
@@ -626,20 +601,18 @@ The functions declarations are not included in the script, although they should 
 
 ```JSON
 [ <functions from the example above>,
-  { "$reduce":
-    { "$call": "getPosts",
-      "$args": [ 37, 10 ] },
-    "$as": "post",
-    "$seed": 0,
-    "$do":
-    [ { "$call": "getComments",
-        "$args": { "$": "post" } },
-      { "$+":
-        [ { "$": "=", "$/": "this is reduce accumulator" },
-          { "$calc": "length",
-            "$args": { "$": "-.text", "$/": "this is comment text" } } ] },
-      { "$": "-" } ] },
-  { "$res$": "-" } ]
+  { "$_.reduce()":
+    [ { "$getPosts()": [ 37, 10 ] },
+      { "$": [ "charsCount", "post" ],
+        "$func":
+        [ { "$getComments()": "$post" },
+          { "$_.map()": [ "$", { "$_.property()":"text" } ] },
+          { "$_.map()": [ "$", "$_.length" ] },
+          { "$+": "$" },
+          { "$result":
+            { "$+": [ "$", "$charsCount" ] } } ] },
+      0 ] },
+  { "$result": "$" } ]
 ```
 
 It is worth noting that if you wanted to simply count the number of comments rather than characters, you would not need to use reduce, it can be done by simply adding the results of `$map` operation.
@@ -647,20 +620,18 @@ It is worth noting that if you wanted to simply count the number of comments rat
 The script below count the number of comments in the last 10 posts of the user:
 
 ```JSON
-[ <functions from the example above>,
+[ "<functions from the example above>",
   { "$+":
-    { "$map":
-      { "$call": "getPosts",
-        "$args": [ 37, 10 ] },
-      "$do":
-      { "$calc": "length",
-        "$args":
-        { "$call": "getComments",
-          "$args": { "$": "~" } } } } },
-  { "$res$": "-" } ]
+    { "$_.map()":
+      [ { "$getPosts()": [ 37, 10 ] },
+        { "$": "post",
+          "$func":
+          { "$_.length()":
+            { "$getComments()": "$post" } } } ] } },
+  { "$result": "$" } ]
 ```
 
-The above script first gets the array of the numbers of all the comments for each post using `$map` and then simply adds then using `$+`.
+The above script first gets the array of the numbers of all the comments for each post using `$_.map` and then simply adds then using `$+`.
 
 If you need to do some other kind of aggregation and you want to accentuate the sequence of execution steps you can use references:
 
@@ -813,3 +784,90 @@ Syntax:
 `$` - the value that the reference will point to. This value can be either data or script. If the reference points to the script that wasn't executed it, it will change it and the new script will be executed (or if the data is assigned, this data will be used as result of the replaced construct). If the reference points to the function, it will be changed - the changed script will be executed the next time the function is called. You can even change the function name in this way.
 
 `$$` - As shown above, this is the equivalent of using the value of reference `{ "$": <JSONScript> }` as the value of the defined reference. If `$def` defines or redefines the named reference, it will point to the same data as the reference in `$$`. If `$def` overwrites an absolute or relative reference to the script, the value from `$$` will be copied by value (deep-cloned).
+
+
+
+
+### Macros
+
+Syntax:
+
+
+```
+{ $macro: <JS:string:rule>, $code: <JSONScript:code_template> }
+```
+
+
+Previous result reference:
+
+```
+{ $macro: '$', $code: { $:'$' } }
+```
+
+Create reference:
+
+```
+{ $macro: { '$%reference:ident': '%value' },
+  $code: { $def: '%reference', $value: '%value' } }
+```
+
+Set reference value:
+
+```
+{ $macro: { '$%reference:ident=': '%value' },
+  $code: { $set: '%reference', $value: '%value' } }
+```
+
+Get reference value:
+
+```
+{ $macro: { '%key': '$%reference:ident' },
+  $code: { '%key': { $get: '%reference' } } }
+```
+
+Call function:
+
+```
+{ $macro: { '$%func:ident()': '%args' },
+  $code: { $call: '%func', $args: '%args' } }
+```
+
+Define function:
+
+```
+{ $macro: { '$%name:ident': '%args', $func: '%body' }
+  $code: { $def: '%name', $args: '%args', $func: '%body' } }
+```
+
+Anonymous function
+
+```
+{ $macro: { $: '%args', $func: '%body' }
+  $code: { $args: '%args', $func: '%body' } }
+```
+
+Arrow function
+
+```
+{ $macro: { '$%name:ident=>': '%body' },
+  $code: { $args: ['%name'], $func: '%body' } }
+```
+
+Map macro
+
+```
+{ $macro:
+  { $map: '%coll',
+    $as: '%val:ident',
+    '/\$(index|key)/?':  '%index:ident'
+    $do: '%body' },
+  $code:
+  { $map:
+    [ '%coll',
+      { $:
+        { $eval:
+          { $if: '%index',
+            $then: { $code: ['%val', '%index'] },
+            $else: { $code: ['%val'] } } },
+        $func: '%body' } ] } }
+```

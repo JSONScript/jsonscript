@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://jsonscript.net/schema/_defs.json",
+    "title": "Definitions",
+    "defs": {
+        "lowerIdentifier": {
+            "type": "string",
+            "pattern": "^[a-z][A-Za-z0-9_-]*$"
+        },
+        "upperIdentifier": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9_-]*$"
+        },
+        "positiveInt": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "nonEmptyString": { 
+            "type": "string", 
+            "minLength": 1 
+        }
+    }
+}

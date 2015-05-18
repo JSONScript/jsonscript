@@ -1,0 +1,6 @@
+[ 
+  { "spec": { "$exec": "Router", "$method": "routes" }, "valid": true },
+  { "spec": { "$exec": "Router" }, "valid": false },
+  { "spec": { "$exec": "router", "$method": "routes" }, "valid": false },
+  { "spec": { "$exec": "Router", "$method": "Routes" }, "valid": false }
+]

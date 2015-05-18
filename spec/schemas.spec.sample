@@ -1,0 +1,73 @@
+'use strict';
+
+var tv4 = require('tv4');
+var assert = require('assert');
+var fs = require('fs');
+var path = require('path');
+var _ = require('lodash');
+
+
+var SCHEMAS = {
+    'gallery.json': require('../schemas/assets/gallery/gallery.json'),
+    'linklist.json': require('../schemas/assets/linklist/linklist.json'),
+    'list.json': require('../schemas/assets/list/list.json'),
+    'module.json': require('../schemas/assets/module/module.json'),
+    'poll.json': require('../schemas/assets/poll/poll.json'),
+    'channel.json': require('../schemas/assets/channel/channel.json'),
+    'scratch.json': require('../schemas/assets/scratch/scratch.json'),
+    'componentState.json': require('../schemas/objects/component_state/componentState.json'),
+    'cropRequest.json': require('../schemas/objects/crop_request/cropRequest.json'),
+    'image.json': require('../schemas/objects/image/image.json'),
+    'types.json': require('../schemas/defs/types.json')
+};
+
+var metaSchema = require('./meta_schema.json');
+
+var SAMPLES = {
+    //Schema to test : sample data
+    'gallery.json': { sample: require('../schemas/assets/gallery/gallery_sample.json'), isValid: true },
+    'linklist.json': { sample: require('../schemas/assets/linklist/linklist_sample_picswap.json'), isValid: true },
+    'list.json': { sample: require('../schemas/assets/list/list_sample.json'), isValid: true },
+    'channel.json': [
+        { sample: require('../schemas/assets/channel/channel_sample.json'), isValid: true },
+        { sample: require('../schemas/assets/channel/channel_new_panel_sample.json'), isValid: true },
+        { sample: require('../schemas/assets/channel/channel_fail_sample.json'), isValid: false }
+    ],
+    'module.json': { sample: require('../schemas/assets/module/module_sample.json'), isValid: true },
+    'poll.json': { sample: require('../schemas/assets/poll/poll_sample.json'), isValid: true },
+    'scratch.json': [
+        { sample: require('../schemas/assets/scratch/scratch_data_sample.json'), isValid: true },
+        { sample: require('../schemas/assets/scratch/scratch_comp_sample.json'), isValid: true }
+    ],
+    'componentState.json': { sample: require('../schemas/objects/component_state/componentState_sample.json'), isValid: true },
+    'image.json': { sample: require('../schemas/objects/image/image_sample.json'), isValid: true }
+};
+
+
+describe('Schemas', function() {
+    before(function() {
+        for (var name in SCHEMAS) {
+            tv4.addSchema(name, SCHEMAS[name]);
+        }
+    });
+
+    _.forOwn(SCHEMAS, function (schema, schemaName) {
+        it('should have ' + schemaName, function() {
+            var valid = tv4.validate(schema, metaSchema, true, true);
+            assert(valid, tv4.error);
+        });
+    });
+
+    _.forOwn(SAMPLES, function (sample, sampleName) {
+        if (!Array.isArray(sample)) sample = [sample];
+        var length = sample.length;
+        sample.forEach(function(sampleDef, index) {
+            it('should validate ' + sampleName + (length > 1 ? ' '+(index + 1) : ''), function() {
+                this.timeout(20000);
+                var schema = tv4.getSchema(sampleName);
+                var valid = tv4.validate(sampleDef.sample, schema, true, true);
+                assert.equal(valid, sampleDef.isValid, tv4.error);
+            });
+        });
+    });
+});

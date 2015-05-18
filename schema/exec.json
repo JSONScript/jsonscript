@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://jsonscript.net/schema/exec.json",
+    "title": "$exec instruction",
+    "description": "Executes method of external executor",
+    "type": "object",
+    "properties": {
+        "$exec": { "anyOf": [
+            { "$ref": "_defs.json#/defs/upperIdentifier" },
+            { "$ref": "jsonscript.json" } ] },
+        "$method": { "anyOf": [
+            { "$ref": "_defs.json#/defs/lowerIdentifier" },
+            { "$ref": "jsonscript.json" } ] },
+        "$args": {  "anyOf": [
+            {
+                "type": "array",
+                "items": { "anyOf": [
+                    { "$ref": "jsonscript.json" } ] }
+            },
+            { "$ref": "jsonscript.json" } ] }
+    },
+    "additionalProperties": false,
+    "required": [ "$exec", "$method" ]
+}

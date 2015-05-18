@@ -15,6 +15,7 @@
             {
                 "type": "array",
                 "items": { "anyOf": [
+                    { "$ref": "data.json" },
                     { "$ref": "jsonscript.json" } ] }
             },
             { "$ref": "jsonscript.json" } ] }

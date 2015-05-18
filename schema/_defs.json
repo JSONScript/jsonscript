@@ -5,19 +5,23 @@
     "defs": {
         "lowerIdentifier": {
             "type": "string",
-            "pattern": "^[a-z][A-Za-z0-9_-]*$"
+            "pattern": "^[a-z][A-Za-z0-9_]*$"
         },
         "upperIdentifier": {
             "type": "string",
-            "pattern": "^[A-Z][A-Za-z0-9_-]*$"
+            "pattern": "^[A-Z][A-Za-z0-9_]*$"
         },
-        "positiveInt": {
+        "zeroOrPositive": {
             "type": "integer",
-            "minimum": 1
+            "minimum": 0
         },
         "nonEmptyString": { 
             "type": "string", 
             "minLength": 1 
+        },
+        "dataString": {
+            "type": "string",
+            "pattern": "^[^$]|^$"
         }
     }
 }

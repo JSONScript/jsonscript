@@ -10,7 +10,7 @@ var validator = require('is-my-json-valid')
 
 describe('JSONScript schema', function() {
     describe('Meta-schema', function() {
-        it('should be the same as the meta-schema at json-schema.org', function (done) {
+        it('should be the same as the meta-schema at json-schema.org (needs internet connection)', function (done) {
             assert(/^http:\/\/json-schema.org/.test(metaSchema.id));
             request.get(metaSchema.id, function (err, res, body) {
                 assert(!err);
@@ -39,31 +39,46 @@ describe('JSONScript schema', function() {
 
         function testSchema(name) {
             describe(name + ' schema', function() {
+                var schema;
+
+                before(function() {
+                    schema = schemas[name];
+                    assert.equal(typeof schema, 'object', 'file ' + name + ' should parse as an object');
+                });
+
+
                 it('should be valid', function() {
-                    assert.equal(schemas[name].$schema, metaSchema.id);
-                    validateSchema(schemas[name]);
+                    assert.equal(schema.$schema, metaSchema.id);
+                    validateSchema(schema);
                     assert.equal(validateSchema.errors, null);
                 });
 
 
-                if (name != '_defs.json') {
-                    it('should validate spec', function() {
-                        var validate = validator(schemas[name], {
-                            schemas: schemas,
-                            verbose: true,
-                            greedy: true
-                        });
+                it('should validate spec', function() {
+                    var validate = getValidator(schema);
 
-                        assert(Array.isArray(specs[name]), 'schema ' + name + ' should have spec');
+                    assert(Array.isArray(specs[name]), 'schema ' + name + ' should have spec');
 
-                        specs[name].forEach(function (s) {
-                            validate(s.spec);
-                            var assertion = s.valid ? 'equal' : 'notEqual';
-                            assert[assertion](validate.errors, null);
-                        });
+                    specs[name].forEach(function (s) {
+                        var specFile = name.replace('.', '.spec.');
+                        assert.notStrictEqual(s.it, undefined, 'each item in ' + specFile + ' should have "it" property');
+                        assert.equal(typeof s.isValid, 'boolean', 'each item in ' + specFile + ' should have "isValid" property');
+                        var _validate = s.schema ? getValidator(s.schema) : validate;
+                        _validate(s.it);
+                        var assertion = s.isValid ? 'equal' : 'notEqual';
+                        assert[assertion](_validate.errors, null);
                     });
-                }
+                });
             });
+
+            
+            function getValidator(schema) {
+                return validator(schema, {
+                    schemas: schemas,
+                    verbose: true,
+                    greedy: true
+                });
+            }
         }
 
 
@@ -74,8 +89,10 @@ describe('JSONScript schema', function() {
             specs = {};
             files.forEach(function (f) {
                 var parts = f.split('.');
-                var name = parts[0] + '.' + parts.pop();
-                var module = require(schemasPath + f);
+                var ext = parts.pop()
+                if (ext != 'json') return;
+                var name = parts[0] + '.' + ext;
+                try { var module = require(schemasPath + f); } catch(e) {}
                 if (parts.length == 1)
                     schemas[name] = module;
                 else if (parts.length == 2 && parts[1] == 'spec')

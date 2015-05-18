@@ -1,6 +1,6 @@
 [ 
-  { "spec": { "$exec": "Router", "$method": "routes" }, "valid": true },
-  { "spec": { "$exec": "Router" }, "valid": false },
-  { "spec": { "$exec": "router", "$method": "routes" }, "valid": false },
-  { "spec": { "$exec": "Router", "$method": "Routes" }, "valid": false }
+  { "it": { "$exec": "Router", "$method": "routes" }, "isValid": true },
+  { "it": { "$exec": "Router" }, "isValid": false },
+  { "it": { "$exec": "router", "$method": "routes" }, "isValid": false },
+  { "it": { "$exec": "Router", "$method": "Routes" }, "isValid": false }
 ]

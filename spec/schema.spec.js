@@ -40,6 +40,7 @@ describe('JSONScript schema', function() {
         function testSchema(name) {
             describe(name + ' schema', function() {
                 var schema;
+                var specFile = name.replace('.', '.spec.');
 
                 before(function() {
                     schema = schemas[name];
@@ -54,31 +55,53 @@ describe('JSONScript schema', function() {
                 });
 
 
-                it('should validate spec', function() {
-                    var validate = getValidator(schema);
 
-                    assert(Array.isArray(specs[name]), 'schema ' + name + ' should have spec');
+                describe(specFile, function() {
+                    var validate;
 
-                    specs[name].forEach(function (s) {
-                        var specFile = name.replace('.', '.spec.');
-                        assert.notStrictEqual(s.it, undefined, 'each item in ' + specFile + ' should have "it" property');
-                        assert.equal(typeof s.isValid, 'boolean', 'each item in ' + specFile + ' should have "isValid" property');
-                        var _validate = s.schema ? getValidator(s.schema) : validate;
-                        _validate(s.it);
-                        var assertion = s.isValid ? 'equal' : 'notEqual';
-                        assert[assertion](_validate.errors, null);
+                    before(function() {
+                        validate = getValidator(schema);
+                    });
+
+                    it('spec file should be array', function() {
+                        assert(Array.isArray(specs[name]), specFile + ' should be array');
+                    });
+
+                    if (!Array.isArray(specs[name])) return;
+
+                    specs[name].forEach(function (s, index) {
+                        var schemaStr = s.schema ? objToString(s.schema, 24) + ' :' : '';
+                        var itStr = objToString(s.it, 48);
+                        var validStr = 'should' + (s.isValid ? ' ' : ' NOT ') + 'be valid';
+
+                        it([schemaStr, itStr, validStr].join(' '), function() {
+                            assert.notStrictEqual(s.it, undefined, 'item #' + index + ' should have "it" property');
+                            assert.equal(typeof s.isValid, 'boolean', 'item #' + index + ' should have "isValid" property');
+                            var _validate = s.schema ? getValidator(s.schema) : validate;
+                            _validate(s.it);
+                            var assertion = s.isValid ? 'equal' : 'notEqual';
+                            assert[assertion](_validate.errors, null);
+                        });
                     });
                 });
             });
+        }
 
-            
-            function getValidator(schema) {
-                return validator(schema, {
-                    schemas: schemas,
-                    verbose: true,
-                    greedy: true
-                });
-            }
+
+        function getValidator(schema) {
+            return validator(schema, {
+                schemas: schemas,
+                verbose: true,
+                greedy: true
+            });
+        }
+
+
+        function objToString(obj, maxLength) {
+            var str = JSON.stringify(obj);
+            if (str.length > maxLength + 3)
+                str = str.slice(0, maxLength) + '...';
+            return str;
         }
 
 

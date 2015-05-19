@@ -7,7 +7,6 @@
   { "it": null, "isValid": true },
   { "it": true, "isValid": true },
   { "it": false, "isValid": true },
-  { "it": false, "isValid": true },
   { "it": [ { "c": 5 }, { "d": 7 } ], "isValid": true },
   { "it": { "a": "abc", "b": [ { "c": 5 }, { "d": null } ] }, "isValid": true },
   { "it": [ { "c": 5 }, { "d": { "$exec": "Router", "$method": "get" } } ], "isValid": false },

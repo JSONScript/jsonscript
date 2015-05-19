@@ -1,0 +1,11 @@
+[
+  { "it": { "$exec": "Router", "$method": "get" }, "isValid": false },
+  { "it": [ { "$exec": "Router", "$method": "get" } ], "isValid": true },
+  { "it": [ { "$exec": "Router", "$method": "get", "$args": [1] },
+            { "$exec": "Router", "$method": "get", "$args": [2] } ], 
+    "isValid": true },
+  { "it": [], "isValid": true },
+  { "it": [ "data", "is", "also", "ok" ], "isValid": true },
+  { "it": {}, "isValid": false },
+  { "it": { "object": "is not ok" }, "isValid": false }
+]

@@ -21,8 +21,14 @@
   },
   "homepage": "https://github.com/JSONScript/jsonscript",
   "devDependencies": {
+    "json-schema-consolidate": "^0.1.1",
     "is-my-json-valid": "^2.12.0",
+    "jjv": "^1.0.2",
+    "jsonschema": "^1.0.1",
     "mocha": "^2.2.5",
-    "request": "^2.55.0"
+    "request": "^2.55.0",
+    "skeemas": "^1.1.6",
+    "tv4": "^1.1.9",
+    "z-schema": "^3.10.0"
   }
 }

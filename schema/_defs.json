@@ -3,6 +3,10 @@
     "id": "http://jsonscript.net/schema/_defs.json",
     "title": "Definitions",
     "defs": {
+        "identifier": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
         "lowerIdentifier": {
             "type": "string",
             "pattern": "^[a-z][A-Za-z0-9_]*$"

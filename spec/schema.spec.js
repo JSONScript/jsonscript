@@ -1,11 +1,19 @@
 'use strict';
 
-var validator = require('is-my-json-valid')
+var consolidate = require('json-schema-consolidate')
+    , validator = consolidate('jjv', { allErrors: true, verbose: true })
+
+    // , jjv = require('jjv')()
+    // , Validator = require('jsonschema').Validator
+    // , validator = new Validator
     , assert = require('assert')
     , metaSchema = require('./meta_schema.json')
     , request = require('request')
     , fs = require('fs')
     , path = require('path');
+
+
+var ONLY = '';
 
 
 describe('JSONScript schema', function() {
@@ -27,10 +35,10 @@ describe('JSONScript schema', function() {
         loadSchemas();
 
         before(function() {
-            validateSchema = validator(metaSchema, {
-                verbose: true,
-                greedy: true
-            });
+            validateSchema = validator.compile(metaSchema);
+
+            for (var name in schemas)
+                validator.addSchema(schemas[name], name);
         });
 
 
@@ -38,6 +46,8 @@ describe('JSONScript schema', function() {
 
 
         function testSchema(name) {
+            if (ONLY && ONLY != name) return;
+
             describe(name + ' schema', function() {
                 var schema;
                 var specFile = name.replace('.', '.spec.');
@@ -50,8 +60,8 @@ describe('JSONScript schema', function() {
 
                 it('should be valid', function() {
                     assert.equal(schema.$schema, metaSchema.id);
-                    validateSchema(schema);
-                    assert.equal(validateSchema.errors, null);
+                    var result = validateSchema(schema);
+                    assert.deepEqual(result.errors, []);
                 });
 
 
@@ -60,7 +70,7 @@ describe('JSONScript schema', function() {
                     var validate;
 
                     before(function() {
-                        validate = getValidator(schema);
+                        validate = validator.compile(schema);
                     });
 
                     it('spec file should be array', function() {
@@ -70,29 +80,21 @@ describe('JSONScript schema', function() {
                     if (!Array.isArray(specs[name])) return;
 
                     specs[name].forEach(function (s, index) {
-                        var schemaStr = s.schema ? objToString(s.schema, 24) + ' :' : '';
+                        var schemaStr = s.schema ? objToString(s.schema, 32) + ' :' : '';
                         var itStr = objToString(s.it, 48);
                         var validStr = 'should' + (s.isValid ? ' ' : ' NOT ') + 'be valid';
 
                         it([schemaStr, itStr, validStr].join(' '), function() {
                             assert.notStrictEqual(s.it, undefined, 'item #' + index + ' should have "it" property');
                             assert.equal(typeof s.isValid, 'boolean', 'item #' + index + ' should have "isValid" property');
-                            var _validate = s.schema ? getValidator(s.schema) : validate;
-                            _validate(s.it);
-                            var assertion = s.isValid ? 'equal' : 'notEqual';
-                            assert[assertion](_validate.errors, null);
+                            var _validate = s.schema ? validator.compile(s.schema) : validate;
+                            var result = _validate(s.it);
+
+                            var assertion = s.isValid ? 'deepEqual' : 'notDeepEqual';
+                            assert[assertion](result.errors, []);
                         });
                     });
                 });
-            });
-        }
-
-
-        function getValidator(schema) {
-            return validator(schema, {
-                schemas: schemas,
-                verbose: true,
-                greedy: true
             });
         }
 

@@ -1,11 +1,8 @@
 'use strict';
 
 var consolidate = require('json-schema-consolidate')
-    , validator = consolidate('jjv', { allErrors: true, verbose: true })
+    , validator = consolidate('ajv', { allErrors: true })
 
-    // , jjv = require('jjv')()
-    // , Validator = require('jsonschema').Validator
-    // , validator = new Validator
     , assert = require('assert')
     , metaSchema = require('./meta_schema.json')
     , request = require('request')
@@ -35,10 +32,10 @@ describe('JSONScript schema', function() {
         loadSchemas();
 
         before(function() {
-            validateSchema = validator.compile(metaSchema);
-
-            for (var name in schemas)
+            for (var name in schemas) {
+                validator.addSchema(schemas[name]);
                 validator.addSchema(schemas[name], name);
+            }
         });
 
 
@@ -56,14 +53,6 @@ describe('JSONScript schema', function() {
                     schema = schemas[name];
                     assert.equal(typeof schema, 'object', 'file ' + name + ' should parse as an object');
                 });
-
-
-                it('should be valid', function() {
-                    assert.equal(schema.$schema, metaSchema.id);
-                    var result = validateSchema(schema);
-                    assert.deepEqual(result.errors, []);
-                });
-
 
 
                 describe(specFile, function() {

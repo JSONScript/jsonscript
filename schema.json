@@ -1,0 +1,71 @@
+{
+  "id": "jsonscript.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "JSONScript schema",
+  "anyOf": [
+    { "$ref": "#/definitions/func" },
+    { "$ref": "#/definitions/method" },
+    { "$ref": "#/definitions/ref" },
+    { "$ref": "#/definitions/data" },
+    { "$ref": "#/definitions/parallel" },
+    { "$ref": "#/definitions/serial" },
+    { "$ref": "#/definitions/scalar" }
+  ],
+  "definitions": {
+    "func": {
+      "description": "call to external function, $func value should evaluate to a string, $args should evaluate to array or object",
+      "type": "object",
+      "properties": {
+        "$func": { "$ref": "#" },
+        "$args": { "$ref": "#" }
+      },
+      "additionalProperties": false,
+      "required": [ "$func" ]
+    },
+    "method": {
+      "description": "call to external object, $func value should evaluate to a string, $args should evaluate to array or object",
+      "type": "object",
+      "properties": {
+        "$object": { "$ref": "#" },
+        "$method": { "$ref": "#" },
+        "$args": { "$ref": "#" }
+      },
+      "additionalProperties": false,
+      "required": [ "$func" ]
+    },
+    "data": {
+      "description": "data from the data instance using JSON-pointer expression, $data value should evalute to a string before the expression is evaluated",
+      "type": "object",
+      "properties": {
+        "$data": { "$ref": "#" }
+      },
+      "additionalProperties": false,
+      "required": [ "$data" ]
+    },
+    "ref": {
+      "description": "data/script from the current script using absolute/relative JSON-pointer expression",
+      "type": "object",
+      "properties": {
+        "$ref": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": [ "$ref" ]
+    },
+    "parallel": {
+      "description": "scripts in the object are executed in parallel, property names should not start with $",
+      "type": "object",
+      "patternProperties": {
+        "^[^$]": { "$ref": "#" }
+      },
+      "additionalProperties": false
+    },
+    "serial": {
+      "description": "scripts in array are executed sequentially",
+      "type": "array",
+      "items": { "$ref": "#" }
+    },
+    "scalar": {
+      "type": [ "string", "number", "boolean", "null" ]
+    }
+  }
+}

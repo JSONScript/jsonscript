@@ -1,0 +1,40 @@
+[
+  {
+    "description": "simple $func call",
+    "schemas": [
+      {
+        "description": "schema jsonscript.json",
+        "$ref": "jsonscript.json#"
+      },
+      {
+        "description": "schema jsonscript.json#/definitions/func",
+        "$ref": "jsonscript.json#/definitions/func"
+      }
+    ],
+    "tests": [
+      {
+        "description": "with args",
+        "data": {
+          "$func": "myfunc",
+          "$args": [1, 2, 3]
+        },
+        "valid": true
+      },
+      {
+        "description": "without args",
+        "data": {
+          "$func": "myfunc"
+        },
+        "valid": true
+      },
+      {
+        "description": "additional propertes are invalid",
+        "data": {
+          "$func": "myfunc",
+          "extra": {}
+        },
+        "valid": false
+      }
+    ]
+  }
+]

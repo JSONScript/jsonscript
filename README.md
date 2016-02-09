@@ -14,11 +14,6 @@ JSONScript has been recently started and currently is under development. This re
 Soon there will be a JavaScript interpreter for JSONScript and a compiler of JSONScript to JavaScript. Once it is done, there will be the middleware for express web framework to support batch processing of requests on the server using JSONScript.
 
 
-## Mailing list
-
-If you would like to receive an email when some usable part is complete, please sign up to the Mailchimp mailing list [here](http://eepurl.com/bmSE3z).
-
-
 ## Problem
 
 Management of remote systems is usually done via APIs.

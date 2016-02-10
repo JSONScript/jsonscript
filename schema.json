@@ -31,7 +31,7 @@
         "$args": { "$ref": "#" }
       },
       "additionalProperties": false,
-      "required": [ "$func" ]
+      "required": [ "$method", "$object" ]
     },
     "data": {
       "description": "data from the data instance using JSON-pointer expression, $data value should evalute to a string before the expression is evaluated",
@@ -46,7 +46,7 @@
       "description": "data/script from the current script using absolute/relative JSON-pointer expression",
       "type": "object",
       "properties": {
-        "$ref": { "type": "string" }
+        "$ref": { "$ref": "#" }
       },
       "additionalProperties": false,
       "required": [ "$ref" ]

@@ -22,7 +22,7 @@
   "homepage": "https://github.com/JSONScript/jsonscript",
   "devDependencies": {
     "ajv": "^3.5.3",
-    "json-schema-test": "^1.1.1",
+    "json-schema-test": "^1.2.1",
     "mocha": "^2.2.5"
   }
 }

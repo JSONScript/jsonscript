@@ -1,0 +1,35 @@
+{
+  "id": "evaluate.json#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "description": "schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
+  "switch": [
+    {
+      "if": { "type": "object" },
+      "then": {
+        "additionalProperties": { "$ref": "#" },
+        "switch": [
+          {
+            "if": { "required": [ "$func" ] },
+            "then": { "callFunc": [ "0/$func", "0/$args" ] }
+          },
+          {
+            "if": { "required": [ "$method" ] },
+            "then": { "callMethod": [ "0/$object", "0/$method", "0/$args" ] }
+          },
+          {
+            "if": { "required": [ "$ref" ] },
+            "then": { "getRef": [ "0/$ref" ] }
+          },
+          {
+            "if": { "required": [ "$data" ] },
+            "then": { "getData": [ "0/$data" ] }
+          }
+        ]
+      }
+    },
+    {
+      "if": { "type": "array" },
+      "then": { "processSequence": [ "0/" ] }
+    }
+  ]
+}

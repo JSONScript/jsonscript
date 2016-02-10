@@ -1,15 +1,9 @@
 [
   {
-    "description": "simple $func call",
+    "description": "$func call",
     "schemas": [
-      {
-        "description": "schema jsonscript.json",
-        "$ref": "jsonscript.json#"
-      },
-      {
-        "description": "schema jsonscript.json#/definitions/func",
-        "$ref": "jsonscript.json#/definitions/func"
-      }
+      { "$ref": "jsonscript.json#" },
+      { "$ref": "jsonscript.json#/definitions/func" }
     ],
     "tests": [
       {
@@ -32,6 +26,62 @@
         "data": {
           "$func": "myfunc",
           "extra": {}
+        },
+        "valid": false
+      },
+      {
+        "description": "valid if $args is a valid script",
+        "data": {
+          "$func": "myfunc",
+          "$args": {
+            "$func": "myfunc2",
+            "$args": [1, 2, 3]
+          }
+        },
+        "valid": true
+      },
+      {
+        "description": "valid if $args contain valid scripts",
+        "data": {
+          "$func": "myfunc",
+          "$args": [
+            {
+              "$func": "myfunc2",
+              "$args": [1, 2, 3]
+            },
+            {
+              "$func": "myfunc2",
+              "$args": [4, 5, 6]
+            }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "description": "invalid if $args is a invalid script",
+        "data": {
+          "$func": "myfunc",
+          "$args": {
+            "$func": "myfunc2",
+            "extra": {}
+          }
+        },
+        "valid": false
+      },
+      {
+        "description": "valid if $args contain valid scripts",
+        "data": {
+          "$func": "myfunc",
+          "$args": [
+            {
+              "$func": "myfunc2",
+              "$args": [1, 2, 3]
+            },
+            {
+              "$func": "myfunc2",
+              "extra": {}
+            }
+          ]
         },
         "valid": false
       }

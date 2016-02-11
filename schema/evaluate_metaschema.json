@@ -10,12 +10,12 @@
           "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",
           "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#"
         },
-        "applyFunc": {
+        "callFunc": {
           "title": "$func call",
           "description": "call function defined by $func instruction. Keyword should replace the instruction with the result or with the promise",
           "constant": true
         },
-        "applyMethod": {
+        "callMethod": {
           "title": "$method call",
           "description": "call method defined by $object/$method instruction. Keyword should replace the instruction with the result or with the promise",
           "constant": true

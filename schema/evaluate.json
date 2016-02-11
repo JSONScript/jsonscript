@@ -31,11 +31,11 @@
             "switch": [
               {
                 "if": { "required": [ "$func" ] },
-                "then": { "applyFunc": true }
+                "then": { "callFunc": true }
               },
               {
                 "if": { "required": [ "$method" ] },
-                "then": { "applyMethod": true }
+                "then": { "callMethod": true }
               },
               {
                 "if": { "required": [ "$ref" ] },

@@ -6,30 +6,58 @@
     {
       "if": { "type": "object" },
       "then": {
-        "additionalProperties": { "$ref": "#" },
-        "switch": [
+        "title": "parallel execution or script command",
+        "description": "evaluates all properties in parallel or executes script command (its keywords are evaluated in parallel too)",
+        "allOf":[
           {
-            "if": { "required": [ "$func" ] },
-            "then": { "callFunc": [ "0/$func", "0/$args" ] }
+            "title": "evaluate properties",
+            "description": "evaluates all properties using the same schema, properties-scripts are replaced with promises",
+            "additionalProperties": { "$ref": "#" }
           },
           {
-            "if": { "required": [ "$method" ] },
-            "then": { "callMethod": [ "0/$object", "0/$method", "0/$args" ] }
+            "title": "validate keywords",
+            "description": "validates script keyword values or chains promises to validate resolved values of keywords",
+            "properties": {
+              "$func":   { "thenValue": { "type": "string" } },
+              "$object": { "thenValue": { "type": "string" } },
+              "$method": { "thenValue": { "type": "string" } },
+              "$ref":    { "thenValue": { "type": "string" } },
+              "$data":   { "thenValue": { "type": "string" } },
+              "$args":   { "thenValue": { "type": [ "array", "object" ] } }
+            }
           },
           {
-            "if": { "required": [ "$ref" ] },
-            "then": { "getRef": [ "0/$ref" ] }
-          },
-          {
-            "if": { "required": [ "$data" ] },
-            "then": { "getData": [ "0/$data" ] }
+            "title": "execute command",
+            "description": "executes supported script commands",
+            "switch": [
+              {
+                "if": { "required": [ "$func" ] },
+                "then": { "applyFunc": [ "0/$func", "0/$args" ] }
+              },
+              {
+                "if": { "required": [ "$method" ] },
+                "then": { "applyMethod": [ "0/$object", "0/$method", "0/$args" ] }
+              },
+              {
+                "if": { "required": [ "$ref" ] },
+                "then": { "getRef": [ "0/$ref" ] }
+              },
+              {
+                "if": { "required": [ "$data" ] },
+                "then": { "getData": [ "0/$data" ] }
+              }
+            ]
           }
         ]
       }
     },
     {
       "if": { "type": "array" },
-      "then": { "processSequence": [ "0/" ] }
+      "then": {
+        "title": "sequential execution",
+        "description": "queues items so that the next promise is created only after the previous one is resolved",
+        "queueItems": [ "0/" ]
+      }
     }
   ]
 }

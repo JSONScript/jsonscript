@@ -1,0 +1,41 @@
+{
+  "id": "http://json-script.com/schema/evaluate_metaschema.json#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "allOf": [
+    { "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#" },
+    {
+      "properties": {
+        "thenValue": {
+          "title": "'promise' validation",
+          "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",
+          "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#"
+        },
+        "applyFunc": {
+          "title": "$func call",
+          "description": "call function defined by $func instruction. Keyword should replace the instruction with the result or with the promise",
+          "constant": true
+        },
+        "applyMethod": {
+          "title": "$method call",
+          "description": "call method defined by $object/$method instruction. Keyword should replace the instruction with the result or with the promise",
+          "constant": true
+        },
+        "getRef": {
+          "title": "$ref to the part of the script",
+          "description": "Keyword should replace $ref instruction with the result of the script evaluation at this position.",
+          "constant": true
+        },
+        "getData": {
+          "title": "$data reference to the part of the data instance",
+          "description": "Keyword should replace $data instruction with the data value at the position defined by JSON-pointer.",
+          "constant": true
+        },
+        "queueItems": {
+          "title": "sequntial evaluation",
+          "description": "Keyword should replace the array with the promise that resolves to array of results, but instructions should only be executed after the previous one completes",
+          "constant": true
+        }
+      }
+    }
+  ]
+}

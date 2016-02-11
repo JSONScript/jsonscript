@@ -1,7 +1,7 @@
 [
   {
     "description": "$func call",
-    "schema": { "$ref": "jsonscript.json#func" },
+    "schema": { "$ref": "http://json-script.com/schema/schema.json#func" },
     "tests": [
       {
         "description": "with args",

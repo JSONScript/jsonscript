@@ -1,6 +1,6 @@
 {
-  "id": "evaluate.json#",
-  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "id": "http://json-script.com/schema/evaluate.json#",
+  "$schema": "http://json-script.com/schema/evaluate_metaschema.json#",
   "description": "schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
   "switch": [
     {
@@ -11,19 +11,18 @@
         "allOf":[
           {
             "title": "evaluate properties",
-            "description": "evaluates all properties using the same schema, properties-scripts are replaced with promises",
+            "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned data or 'promise'",
             "additionalProperties": { "$ref": "#" }
           },
           {
             "title": "validate keywords",
             "description": "validates script keyword values or chains promises to validate resolved values of keywords",
             "properties": {
-              "$func":   { "thenValue": { "type": "string" } },
-              "$object": { "thenValue": { "type": "string" } },
-              "$method": { "thenValue": { "type": "string" } },
-              "$ref":    { "thenValue": { "type": "string" } },
-              "$data":   { "thenValue": { "type": "string" } },
-              "$args":   { "thenValue": { "type": [ "array", "object" ] } }
+              "$func":   { "thenValue": { "$ref": "#uuidOrIdentifier" } },
+              "$object": { "thenValue": { "$ref": "#uuidOrIdentifier" } },
+              "$method": { "thenValue": { "$ref": "#identifier" } },
+              "$ref":    { "thenValue": { "$ref": "#jsonPointer" } },
+              "$data":   { "thenValue": { "$ref": "#anyJsonPointer" } }
             }
           },
           {
@@ -32,19 +31,19 @@
             "switch": [
               {
                 "if": { "required": [ "$func" ] },
-                "then": { "applyFunc": [ "0/$func", "0/$args" ] }
+                "then": { "applyFunc": true }
               },
               {
                 "if": { "required": [ "$method" ] },
-                "then": { "applyMethod": [ "0/$object", "0/$method", "0/$args" ] }
+                "then": { "applyMethod": true }
               },
               {
                 "if": { "required": [ "$ref" ] },
-                "then": { "getRef": [ "0/$ref" ] }
+                "then": { "getRef": true }
               },
               {
                 "if": { "required": [ "$data" ] },
-                "then": { "getData": [ "0/$data" ] }
+                "then": { "getData": true }
               }
             ]
           }
@@ -56,8 +55,36 @@
       "then": {
         "title": "sequential execution",
         "description": "queues items so that the next promise is created only after the previous one is resolved",
-        "queueItems": [ "0/" ]
+        "queueItems": true
       }
     }
-  ]
+  ],
+  "definitions": {
+    "identifier": {
+      "id": "#identifier",
+      "type": "string",
+      "pattern": "^[A-Za-z$_][A-Za-z$_0-9]*$"
+    },
+    "uuidOrIdentifier": {
+      "id": "#uuidOrIdentifier",
+      "type": "string",
+      "anyOf": [
+        { "pattern": "^[A-Za-z$_][A-Za-z$_0-9]*$" },
+        { "format": "uuid" }
+      ]
+    },
+    "jsonPointer": {
+      "id": "#jsonPointer",
+      "type": "string",
+      "format": "json-pointer"
+    },
+    "anyJsonPointer": {
+      "id": "#anyJsonPointer",
+      "type": "string",
+      "anyOf": [
+        { "format": "json-pointer" },
+        { "format": "relative-json-pointer" }
+      ]
+    }
+  }
 }

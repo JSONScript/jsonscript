@@ -1,70 +1,86 @@
 {
   "id": "jsonscript.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "description": "JSONScript schema",
+  "title": "JSONScript schema",
+  "description": "JSONScript without instructions: on the top level only parallel/serial execution is allowed",
   "anyOf": [
-    { "$ref": "#/definitions/func" },
-    { "$ref": "#/definitions/method" },
-    { "$ref": "#/definitions/ref" },
-    { "$ref": "#/definitions/data" },
-    { "$ref": "#/definitions/parallel" },
-    { "$ref": "#/definitions/serial" },
-    { "$ref": "#/definitions/scalar" }
+    { "$ref": "#parallel" },
+    { "$ref": "#serial" }
   ],
   "definitions": {
+    "script": {
+      "id": "#script",
+      "title": "JSONScript script with instructions", 
+      "anyOf": [
+        { "$ref": "#func" },
+        { "$ref": "#method" },
+        { "$ref": "#ref" },
+        { "$ref": "#data" },
+        { "$ref": "#parallel" },
+        { "$ref": "#serial" },
+        { "$ref": "#scalar" }
+      ]
+    },
     "func": {
+      "id": "#func",
       "description": "call to external function, $func value should evaluate to a string, $args should evaluate to array or object",
       "type": "object",
       "properties": {
-        "$func": { "$ref": "#" },
-        "$args": { "$ref": "#" }
+        "$func": { "$ref": "#script" },
+        "$args": { "$ref": "#script" }
       },
       "additionalProperties": false,
       "required": [ "$func" ]
     },
     "method": {
+      "id": "#method",
       "description": "call to external object, $func value should evaluate to a string, $args should evaluate to array or object",
       "type": "object",
       "properties": {
-        "$object": { "$ref": "#" },
-        "$method": { "$ref": "#" },
-        "$args": { "$ref": "#" }
+        "$object": { "$ref": "#script" },
+        "$method": { "$ref": "#script" },
+        "$args": { "$ref": "#script" }
       },
       "additionalProperties": false,
       "required": [ "$method", "$object" ]
     },
-    "data": {
-      "description": "data from the data instance using JSON-pointer expression, $data value should evalute to a string before the expression is evaluated",
-      "type": "object",
-      "properties": {
-        "$data": { "$ref": "#" }
-      },
-      "additionalProperties": false,
-      "required": [ "$data" ]
-    },
     "ref": {
+      "id": "#ref",
       "description": "data/script from the current script using absolute/relative JSON-pointer expression",
       "type": "object",
       "properties": {
-        "$ref": { "$ref": "#" }
+        "$ref": { "$ref": "#script" }
       },
       "additionalProperties": false,
       "required": [ "$ref" ]
     },
+    "data": {
+      "id": "#data",
+      "description": "data from the data instance using JSON-pointer expression, $data value should evalute to a string before the expression is evaluated",
+      "type": "object",
+      "properties": {
+        "$data": { "$ref": "#script" }
+      },
+      "additionalProperties": false,
+      "required": [ "$data" ]
+    },
     "parallel": {
+      "id": "#parallel",
       "description": "scripts in the object are executed in parallel, property names should not start with $",
       "type": "object",
       "patternProperties": {
-        "^[^$]": { "$ref": "#" }
+        "^[^$]": { "$ref": "#script" }
       },
       "additionalProperties": false
     },
     "serial": {
+      "id": "#serial",
       "description": "scripts in array are executed sequentially",
       "type": "array",
-      "items": { "$ref": "#" }
+      "items": { "$ref": "#script" }
     },
     "scalar": {
+      "id": "#scalar",
       "type": [ "string", "number", "boolean", "null" ]
     }
   }

@@ -2,16 +2,17 @@
 
 Platform independent asynchronous and concurrent scripting language using JSON format.
 
-JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests.
-
-It uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic). It implements control structures that are somewhat similar to JavaScript. It is fundamentally asynchronous and concurrent without the need to use any special keywords for it. It is extremely flexible and powerful as it allows to define and pass functions and closures, macros and to manipulate the script during it's execution. At the same time it is simple as it doesn't define or create any data structures apart from those that are created in the result of the JSONScript script execution. All the actual processing in the remote system is done synchronously or asynchronously by the executors supplied by the host environment.
+JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests and unnecessary transfers of intermediary results.
 
 
-## Project state
+## Features
 
-JSONScript has been recently started and currently is under development. This repository contains language specification that is being finalized and no other development has been started yet.
+JSONScript:
 
-Soon there will be a JavaScript interpreter for JSONScript and a compiler of JSONScript to JavaScript. Once it is done, there will be the middleware for express web framework to support batch processing of requests on the server using JSONScript.
+- uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic)
+- defines simple control structures.
+- is asynchronous and concurrent without the need to use any special keywords
+- actual processing in the remote system is done synchronously or asynchronously by the functions and objects supplied to JSONScript interpreter by the host environment.
 
 
 ## Problem
@@ -20,20 +21,20 @@ Management of remote systems is usually done via APIs.
 
 It is often required to make multiple sequential or parallel calls, sometimes with some conditions between calls, to get the required result. It can be achieved in two ways:
 
-1. Sending multiple requests to the remote system and implementing all the logic in the client system. The advantage of this approach is that the remote system remains unchanged and client can easily change the logic and flow of requests. The disadvantage is the latency - each request should travel via the network.
+1. Sending multiple requests to the remote system and implementing all the logic in the client system. The advantage of this approach is that the remote system remains unchanged and the client can easily change the logic and flow of requests. The disadvantage is the latency and the traffic - each request should travel via the network.
 
 2. Implementing additional methods/endpoints/parameters in the remote system. The advantage of this approach is that the client has to make only one request. The disadvantage is that it requires changing the remote system (= coding + testing + documenting + deploying + monitoring + supporting...). In some cases it is simply impossible. When it is possible, it inevitably leads to the growing complexity of the remote system as more and more specialized methods/APIs are added to it. 
 
-In some cases, developers implement "batch endpoints" that allow to process multiple requests in parallel in a single HTTP request. It covers some of the cases when multiple requests are sent, but not all.
+In some cases, developers implement "batch endpoints" that allow to process multiple requests sequentially or in parallel in a single HTTP request. It covers only use cases when results are independent and there are no conditions or some other logic between requests.
 
 
 ## Solution
 
-JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute all the containig instructions sequentially, or in parallel, and returning all results to the client. All this in a single HTTP (or any other transport) request.
+JSONScript allows you to send a script to the remote system that will be interpreted by the remote system. It will execute the script and return all results to the client. All this in a single HTTP (or any other transport) request.
 
 JSONScript allows to keep the API of remote system conscise and simple, only implementing basic methods. At the same time JSONScript allows the client to implement an advanced logic with conditions and looping, sequential and concurrent execution, defining and calling functions and handling exceptions. In this way quite advanced execution can be requested from the remote system in a single transport request.
 
-At the same time JSONScript allows keeping the remote system completely secure as only the executors registered with the interpreter can be used from the JSONScript script and the interpreter can limit resources (time, memory, etc.) that the script can use.
+At the same time JSONScript allows keeping the remote system completely secure as only the functions and objects registered with the interpreter can be used from the JSONScript script and the interpreter can limit resources (time, memory, etc.) that the script can use.
 
 
 ## JSONScript qualities
@@ -60,47 +61,37 @@ JSONScript uses JSON format to express the script.
 
 A valid JSONScript script can be an object or an array.
 
-JSON data is a valid JSONScript as long as none of the objects keys and values use "$" and "." as their first symbol. If you need to use JSON data with the key starting with "$" or ".", it can be escaped with "\": `{ "\$exec": "name" }`. This "\" will be removed from data by JSONScript interpreter.
-
 Keys starting from "$" mean JSONScript commands or some variable/function/executor names.
 
-If there is no execution instructions in JSONScript ( no keys starting with "$"), it will return the same JSON as the result.
+If there are no execution instructions in JSONScript ( no keys starting with "$"), it will return the same JSON as the result.
 
 
-### Envoking methods of executors provided by the host environment.
+### Envoking methods of objects provided by the host environment.
 
 Syntax:
 
 ```
-{ "$exec": <JSONScript:string:Executor>,
-  "$method": <JSONScript:string:method>,
+{ "$object": <JSONScript:string>,
+  "$method": <JSONScript:string>,
   "$args": <JSONScript> }
 ```
 
-or short (uses macro):
 
-```
-{"$<Executor>.<method>()": <JSONScript:arguments> }
-```
+Object should be registered with the interpreter before it can be used in the script. The name of the object should be a valid identifier (first character is latin letter, others are letters, numbers, "_" and "-").
 
-Executor should be registered with the interpreter before it can be used in the script. The name of the executor should be a valid identifier (first character is latin letter, others are letters, numbers, "_" and "-") with the first capital letter. First capital letter cannot be used in functions and variables in the script.
+The syntax allows to compute both the name of the object and of the method. Any script returning the string can be used in their place.
 
-The first (full) syntax with the keys `$exec` (shortened "executor"), `$method` and `$args` allows to compute both the name of the executor and of the method. Any script returning the string can be used in their place.
+Basic instruction is not a valid JSONScript script, it should be included in array or object (sequential or parallel execution).
 
-Because in most cases it is not needed, the conscise syntax can be used, where both the executor and method are provided in the key and arguments in the value.
+Instruction can be executed synchronously or asynchronously, as determined by the object. The implementation of asynchronous execution is determined by the implementation of the interpreter and the features available in the host language - it can use callbacks, promises, generators, co-routines, etc. to determine instruction completion.
 
+`$object` is the name of the object that was previously registered with JSONScript interpreter.
 
-Basic instruction is also a valid JSONScript script and can be executed on its own.
+`$method` is the name of method that the object supports. Methods are not registered with interpreter; if the method is not supported, the interpreter will throw an exception METHOD_NOT_IMPLEMENTED.
 
-Instruction can be executed synchronously or asynchronously, as determined by the executor. The implementation of asynchronous execution is determined by the implementation of the interpreter and the features available in the host language - it can use callbacks, promises, generators, co-routines, etc. to determine instruction completion.
+`$args` can be object or array with arguments. Array is passed as multiple arguments, object is passed as a single argument. Arguments can be references to the results of previous instructions, as shown below, and any valid JSONScript. If some of the argument is a JSONScript, the result of it's execution will be passed.
 
-`$exec` is the name of the executor that was previously registered with JSONScript interpreter. Depending on the implementation of the interpreter, an executor can be an object or function.
-
-`$method` is the name of method that the executor supports. Methods are not registered with interpreter; if the method is not supported, the executor should throw an exception METHOD_NOT_IMPLEMENTED.
-
-`$args` can be a scalar, object or array with arguments. Array is passed as multiple arguments, scalar and object are passed as a single argument. Arguments can be references to the results of previous instructions, as shown below, and any valid JSONScript. If some of the argument is a JSONScript, the result of it's execution will be passed.
-
-The result of the basic instruction execution should be a valid JSON.
+The result of the basic instruction execution should be a valid JSON data.
 
 
 ##### Examples

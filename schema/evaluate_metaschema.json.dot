@@ -2,26 +2,17 @@
   "id": "http://json-script.com/schema/evaluate_metaschema.json#",
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "allOf": [
-    {
-      "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#"
-    },
+    { "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#" },
     {
       "properties": {
-        "callExec": {
-          "title": "$exec call",
-          "description": "call function or method in $exec instruction; keyword should replace the instruction with the result or with the promise",
-          "constant": true
-        },
-        "getRef": {
-          "title": "$ref to the part of the script",
-          "description": "Keyword should replace $ref instruction with the result of the script evaluation at this position",
-          "constant": true
-        },
-        "getData": {
-          "title": "$data reference to the part of the data instance",
-          "description": "Keyword should replace $data instruction with the data value at the position defined by JSON-pointer",
-          "constant": true
-        },
+        {{~ it.instructions:inst }}
+          {{ var ev = inst.evaluate; }}
+          "{{=ev.keyword}}": {
+            {{?ev.title}}"title": "{{=ev.title}}",{{?}}
+            {{?ev.description}}"description": "{{=ev.description}}",{{?}}
+            "constant": true
+          },
+        {{~}}
         "thenValue": {
           "title": "'promise' validation",
           "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",

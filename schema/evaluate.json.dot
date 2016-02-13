@@ -1,0 +1,60 @@
+{
+  "id": "http://json-script.com/schema/evaluate.json#",
+  "$schema": "http://json-script.com/schema/evaluate_metaschema.json#",
+  "description": "schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
+  "switch": [
+    {
+      "if": { "type": "object" },
+      "then": {
+        "title": "parallel execution or script command",
+        "description": "evaluates all properties in parallel or executes script command (its keywords are evaluated in parallel too)",
+        "allOf":[
+          {
+            "title": "evaluate properties",
+            "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned data or 'promise'",
+            "additionalProperties": { "$ref": "#" }
+          },
+          {
+            "title": "object to promise",
+            "description": "merge object properties into a single promise",
+            "objectToPromise": true
+          },
+          {
+            "title": "execute instruction",
+            "description": "executes supported script instructions",
+            "thenValue": {
+              "switch": [
+                {{~ it.instructions:inst:i }}
+                  {{?i}},{{?}}
+                  {
+                    "if": { "required": [ "{{=inst.name}}" ] },
+                    "then": {
+                      "allOf": [
+                        {
+                          "description": "valdate evaluated instruction keywords",
+                          "properties": {{= JSON.stringify(inst.schema) }}
+                        },
+                        {
+                          "description": "execute instruction using custom keyword",
+                          "{{=inst.evaluate.keyword}}": true
+                        }
+                      ]
+                    }
+                  }
+                {{~}}
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": { "type": "array" },
+      "then": {
+        "title": "sequential execution",
+        "description": "queues items so that the next promise is created only after the previous one is resolved",
+        "queueItems": true
+      }
+    }
+  ]
+}

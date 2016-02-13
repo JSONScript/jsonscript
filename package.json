@@ -4,7 +4,9 @@
   "description": "Platform independent asynchronous and concurrent scripting language using JSON format",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive --reporter=spec spec"
+    "generate": "node scripts/generate",
+    "test-spec": "mocha --recursive --reporter=spec spec",
+    "test": "npm run generate && npm run test-spec"
   },
   "repository": {
     "type": "git",
@@ -24,5 +26,8 @@
     "ajv": "^3.5.3",
     "json-schema-test": "^1.2.1",
     "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "dot": "^1.0.3"
   }
 }

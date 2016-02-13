@@ -1,0 +1,24 @@
+{
+  "name": "$exec",
+  "description": "call to external object, $exec and $method values should evaluate to a string",
+  "keywords": ["$exec", "$method", "$args"],
+  "required": ["$exec"],
+  "evaluate": {
+    "keyword": "callExec",
+    "title": "$exec call",
+    "description": "call function or method in $exec instruction; keyword should replace the instruction with the result or with the promise"
+  },
+  "schema": {
+    "$exec": {
+      "type": "string",
+      "anyOf": [
+        { "format": "js-identifier" },
+        { "format": "uuid" }
+      ]
+    },
+    "$method": {
+      "type": "string",
+      "format": "js-identifier"
+    }
+  }
+}

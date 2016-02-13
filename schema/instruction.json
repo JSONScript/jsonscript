@@ -1,0 +1,65 @@
+{
+  "id": "http://json-script.com/schema/instruction.json#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "description": "schema for instruction definition",
+  "type": "object",
+  "required": [ "name", "description", "keywords", "required", "evaluate", "schema" ],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "$ref": "#scriptKeyword" },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keywords": {
+      "allOf": [
+        { "$ref": "#keywordsArray" },
+        { "contains": { "constant": { "$data": "2/name" } } }
+      ]
+    },
+    "required": {
+      "allOf": [
+        { "$ref": "#keywordsArray" },
+        { "contains": { "constant": { "$data": "2/name" } } }
+      ]
+    },
+    "evaluate": {
+      "type": "object",
+      "required": [ "keyword" ],
+      "properties": {
+        "keyword": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z]+$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "schema": {
+      "type": "object",
+      "patternProperties": {
+        "^\\$[a-z]": { "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "scriptKeyword": {
+      "id": "#scriptKeyword",
+      "type": "string",
+      "pattern": "^\\$[a-z]+$"
+    },
+    "keywordsArray": {
+      "id": "#keywordsArray",
+      "type": "array",
+      "items": { "$ref": "#scriptKeyword" },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}

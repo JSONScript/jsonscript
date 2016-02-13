@@ -1,12 +1,21 @@
 [
   {
-    "description": "$func call",
-    "schema": { "$ref": "http://json-script.com/schema/schema.json#func" },
+    "description": "$exec call",
+    "schema": { "$ref": "http://json-script.com/schema/schema.json" },
     "tests": [
+      {
+        "description": "with method and args",
+        "data": {
+          "$exec": "myobject",
+          "$method": "doit",
+          "$args": [1, 2, 3]
+        },
+        "valid": true
+      },
       {
         "description": "with args",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "$args": [1, 2, 3]
         },
         "valid": true
@@ -14,14 +23,14 @@
       {
         "description": "without args",
         "data": {
-          "$func": "myfunc"
+          "$exec": "myfunc"
         },
         "valid": true
       },
       {
         "description": "additional propertes are invalid",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "extra": {}
         },
         "valid": false
@@ -29,25 +38,25 @@
       {
         "description": "valid if $args is a valid script",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "$args": {
-            "$func": "myfunc2",
+            "$exec": "myfunc2",
             "$args": [1, 2, 3]
           }
         },
         "valid": true
       },
       {
-        "description": "valid if $args contain valid scripts",
+        "description": "valid if $args contains valid scripts",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "$args": [
             {
-              "$func": "myfunc2",
+              "$exec": "myfunc2",
               "$args": [1, 2, 3]
             },
             {
-              "$func": "myfunc2",
+              "$exec": "myfunc2",
               "$args": [4, 5, 6]
             }
           ]
@@ -57,25 +66,25 @@
       {
         "description": "invalid if $args is a invalid script",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "$args": {
-            "$func": "myfunc2",
+            "$exec": "myfunc2",
             "extra": {}
           }
         },
         "valid": false
       },
       {
-        "description": "valid if $args contain valid scripts",
+        "description": "invalid if $args contains invalid scripts",
         "data": {
-          "$func": "myfunc",
+          "$exec": "myfunc",
           "$args": [
             {
-              "$func": "myfunc2",
+              "$exec": "myfunc2",
               "$args": [1, 2, 3]
             },
             {
-              "$func": "myfunc2",
+              "$exec": "myfunc2",
               "extra": {}
             }
           ]

@@ -11,10 +11,8 @@ ajv.addSchema(require('../schema/evaluate'));
 
 jsonSchemaTest([ ajv ], {
   description: 'jsonscript schema and examples tests',
-  suites: {
-    'examples': './scripts/{**/,}*.json'
-  },
+  suites: { 'examples': './scripts/{**/,}*.json' },
   cwd: __dirname,
   hideFolder: 'scripts/',
-  timeout: 20000
+  timeout: 10000
 });

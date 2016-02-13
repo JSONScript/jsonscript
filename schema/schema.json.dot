@@ -1,0 +1,40 @@
+{
+  "id": "http://json-script.com/schema/schema.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "JSONScript schema",
+  "description": "JSONScript script with instructions (generated from template)",
+  "anyOf": [
+    {{~ it.instructions:inst }}
+      {
+        "title": "{{=inst.name}}",
+        "description": "{{=inst.description}}",
+        "type": "object",
+        "properties": {
+          {{~ inst.keywords:keyword:i }}
+            {{?i}},{{?}}
+            "{{=keyword}}": { "$ref": "#" }
+          {{~}}
+        },
+        "additionalProperties": false,
+        "required": {{= JSON.stringify(inst.required) }}
+      },
+    {{~}}
+    {
+      "description": "scripts in the object are executed in parallel, property names should not start with $",
+      "type": "object",
+      "patternProperties": {
+        "^[^$]": { "$ref": "#" }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "scripts in array are executed sequentially",
+      "type": "array",
+      "items": { "$ref": "#" }
+    },
+    {
+      "description": "scalar values are also a valid JSONScript",
+      "type": [ "string", "number", "boolean", "null" ]
+    }
+  ]
+}

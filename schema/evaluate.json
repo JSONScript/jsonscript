@@ -4,87 +4,135 @@
   "description": "schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
   "switch": [
     {
-      "if": { "type": "object" },
+      "if": {
+        "type": "object"
+      },
       "then": {
         "title": "parallel execution or script command",
         "description": "evaluates all properties in parallel or executes script command (its keywords are evaluated in parallel too)",
-        "allOf":[
+        "allOf": [
           {
             "title": "evaluate properties",
             "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned data or 'promise'",
-            "additionalProperties": { "$ref": "#" }
-          },
-          {
-            "title": "validate keywords",
-            "description": "validates script keyword values or chains promises to validate resolved values of keywords",
-            "properties": {
-              "$func":   { "thenValue": { "$ref": "#uuidOrIdentifier" } },
-              "$object": { "thenValue": { "$ref": "#uuidOrIdentifier" } },
-              "$method": { "thenValue": { "$ref": "#identifier" } },
-              "$ref":    { "thenValue": { "$ref": "#jsonPointer" } },
-              "$data":   { "thenValue": { "$ref": "#anyJsonPointer" } }
+            "additionalProperties": {
+              "$ref": "#"
             }
           },
           {
-            "title": "execute command",
-            "description": "executes supported script commands",
-            "switch": [
-              {
-                "if": { "required": [ "$func" ] },
-                "then": { "callFunc": true }
-              },
-              {
-                "if": { "required": [ "$method" ] },
-                "then": { "callMethod": true }
-              },
-              {
-                "if": { "required": [ "$ref" ] },
-                "then": { "getRef": true }
-              },
-              {
-                "if": { "required": [ "$data" ] },
-                "then": { "getData": true }
-              }
-            ]
+            "title": "object to promise",
+            "description": "merge object properties into a single promise",
+            "objectToPromise": true
+          },
+          {
+            "title": "execute instruction",
+            "description": "executes supported script instructions",
+            "thenValue": {
+              "switch": [
+                {
+                  "if": {
+                    "required": [
+                      "$exec"
+                    ]
+                  },
+                  "then": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$exec": {
+                            "type": "string",
+                            "anyOf": [
+                              {
+                                "format": "js-identifier"
+                              },
+                              {
+                                "format": "uuid"
+                              }
+                            ]
+                          },
+                          "$method": {
+                            "type": "string",
+                            "format": "js-identifier"
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "callExec": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "required": [
+                      "$ref"
+                    ]
+                  },
+                  "then": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$ref": {
+                            "type": "string",
+                            "format": "json-pointer"
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "getRef": true
+                      }
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "required": [
+                      "$data"
+                    ]
+                  },
+                  "then": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$data": {
+                            "type": "string",
+                            "anyOf": [
+                              {
+                                "format": "json-pointer"
+                              },
+                              {
+                                "format": "relative-json-pointer"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "getData": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ]
       }
     },
     {
-      "if": { "type": "array" },
+      "if": {
+        "type": "array"
+      },
       "then": {
         "title": "sequential execution",
         "description": "queues items so that the next promise is created only after the previous one is resolved",
         "queueItems": true
       }
     }
-  ],
-  "definitions": {
-    "identifier": {
-      "id": "#identifier",
-      "type": "string",
-      "pattern": "^[A-Za-z$_][A-Za-z$_0-9]*$"
-    },
-    "uuidOrIdentifier": {
-      "id": "#uuidOrIdentifier",
-      "type": "string",
-      "anyOf": [
-        { "pattern": "^[A-Za-z$_][A-Za-z$_0-9]*$" },
-        { "format": "uuid" }
-      ]
-    },
-    "jsonPointer": {
-      "id": "#jsonPointer",
-      "type": "string",
-      "format": "json-pointer"
-    },
-    "anyJsonPointer": {
-      "id": "#anyJsonPointer",
-      "type": "string",
-      "anyOf": [
-        { "format": "json-pointer" },
-        { "format": "relative-json-pointer" }
-      ]
-    }
-  }
+  ]
 }

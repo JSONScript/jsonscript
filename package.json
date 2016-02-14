@@ -1,6 +1,6 @@
 {
   "name": "jsonscript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Platform independent asynchronous and concurrent scripting language using JSON format",
   "main": "index.js",
   "scripts": {
@@ -23,11 +23,9 @@
   },
   "homepage": "https://github.com/JSONScript/jsonscript",
   "devDependencies": {
-    "ajv": "^3.5.3",
+    "ajv": "^3.6.2",
+    "dot": "^1.0.3",
     "json-schema-test": "^1.2.1",
     "mocha": "^2.2.5"
-  },
-  "dependencies": {
-    "dot": "^1.0.3"
   }
 }

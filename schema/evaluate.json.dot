@@ -22,7 +22,7 @@
           {
             "title": "execute instruction",
             "description": "executes supported script instructions",
-            "thenValue": {
+            "thenValidate": {
               "switch": [
                 {{~ it.instructions:inst:i }}
                   {{?i}},{{?}}
@@ -53,7 +53,7 @@
       "then": {
         "title": "sequential execution",
         "description": "queues items so that the next promise is created only after the previous one is resolved",
-        "queueItems": true
+        "itemsSerial": { "$ref": "#" }
       }
     }
   ]

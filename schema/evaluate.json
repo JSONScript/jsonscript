@@ -26,7 +26,7 @@
           {
             "title": "execute instruction",
             "description": "executes supported script instructions",
-            "thenValue": {
+            "thenValidate": {
               "switch": [
                 {
                   "if": {
@@ -43,7 +43,7 @@
                             "type": "string",
                             "anyOf": [
                               {
-                                "format": "js-identifier"
+                                "pattern": "[A-Za-z_$][A-Za-z_$0-9]+"
                               },
                               {
                                 "format": "uuid"
@@ -52,7 +52,7 @@
                           },
                           "$method": {
                             "type": "string",
-                            "format": "js-identifier"
+                            "pattern": "[A-Za-z_$][A-Za-z_$0-9]+"
                           }
                         }
                       },
@@ -131,7 +131,9 @@
       "then": {
         "title": "sequential execution",
         "description": "queues items so that the next promise is created only after the previous one is resolved",
-        "queueItems": true
+        "itemsSerial": {
+          "$ref": "#"
+        }
       }
     }
   ]

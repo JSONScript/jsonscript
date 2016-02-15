@@ -1,7 +1,8 @@
 {
   "id": "http://json-script.com/schema/evaluate.json#",
   "$schema": "http://json-script.com/schema/evaluate_metaschema.json#",
-  "description": "schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
+  "title": "JSONScript evaluation schema",
+  "description": "Schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
   "switch": [
     {
       "if": { "type": "object" },
@@ -11,18 +12,18 @@
         "allOf":[
           {
             "title": "evaluate properties",
-            "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned data or 'promise'",
+            "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned synchronous or asynchronous value",
             "additionalProperties": { "$ref": "#" }
           },
           {
-            "title": "object to promise",
-            "description": "merge object properties into a single promise",
-            "objectToPromise": true
+            "title": "object to [async] value",
+            "description": "Merge object properties into a single [asynchronous] object value",
+            "objectToAsync": true
           },
           {
             "title": "execute instruction",
             "description": "executes supported script instructions",
-            "thenValidate": {
+            "validateAsync": {
               "switch": [
                 {{~ it.instructions:inst:i }}
                   {{?i}},{{?}}
@@ -52,7 +53,7 @@
       "if": { "type": "array" },
       "then": {
         "title": "sequential execution",
-        "description": "queues items so that the next promise is created only after the previous one is resolved",
+        "description": "queues items so that the next items is executed only after the previous asynchronous value receives data",
         "itemsSerial": { "$ref": "#" }
       }
     }

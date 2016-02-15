@@ -9,7 +9,7 @@
       "properties": {
         "callExec": {
           "title": "$exec call",
-          "description": "call function or method in $exec instruction; keyword should replace the instruction with the result or with the promise",
+          "description": "call function or method in $exec instruction; keyword should replace the instruction with synchronous or asynchronous value",
           "constant": true
         },
         "getRef": {
@@ -22,14 +22,14 @@
           "description": "Keyword should replace $data instruction with the data value at the position defined by JSON-pointer",
           "constant": true
         },
-        "thenValidate": {
+        "validateAsync": {
           "title": "'promise' validation",
           "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",
           "$ref": "#"
         },
-        "objectToPromise": {
-          "title": "Object to promise",
-          "description": "Merge object properties to a single promise",
+        "objectToAsync": {
+          "title": "Object to asynchronous value",
+          "description": "Merge object properties into a single [asynchronous] object value",
           "constant": true
         },
         "itemsSerial": {

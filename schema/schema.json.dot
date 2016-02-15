@@ -33,7 +33,7 @@
       "items": { "$ref": "#" }
     },
     {
-      "description": "scalar values are also a valid JSONScript",
+      "description": "scalar values are also valid JSONScript",
       "type": [ "string", "number", "boolean", "null" ]
     }
   ]

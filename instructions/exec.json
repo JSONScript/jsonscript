@@ -6,7 +6,7 @@
   "evaluate": {
     "keyword": "callExec",
     "title": "$exec call",
-    "description": "call function or method in $exec instruction; keyword should replace the instruction with the result or with the promise"
+    "description": "call function or method in $exec instruction; keyword should replace the instruction with synchronous or asynchronous value"
   },
   "schema": {
     "$exec": {

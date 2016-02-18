@@ -1,0 +1,20 @@
+{
+  "name": "$if",
+  "description": "conditional evaluation",
+  "keywords": ["$if", "$then", "$else"],
+  "required": ["$if", "$then"],
+  "evaluate": {
+    "keywords": ["$if"],
+    "validatorKeyword": "eval$if",
+    "title": "$if/$then/$else",
+    "description": "evaluates $if, if it is true - instruction evaluates to the result of $then evaluation ($else is skipped), if it is false - evaluates to $else ($then is skipped), otherwise throws an exception. If $if is false and $else is not defined it evaluates to null"
+  },
+  "schema": {
+    "$if": {
+      "type": "boolean"
+    },
+    "$else": {
+      "default": null
+    }
+  }
+}

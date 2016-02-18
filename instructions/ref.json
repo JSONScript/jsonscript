@@ -4,14 +4,17 @@
   "keywords": ["$ref"],
   "required": ["$ref"],
   "evaluate": {
-    "keyword": "getRef",
+    "validatorKeyword": "eval$ref",
     "title": "$ref to the part of the script",
     "description": "Keyword should replace $ref instruction with the result of the script evaluation at this position"
   },
   "schema": {
     "$ref": {
       "type": "string",
-      "format": "json-pointer"
+      "anyOf": [
+        { "format": "json-pointer" },
+        { "format": "relative-json-pointer" }
+      ]
     }
   }
 }

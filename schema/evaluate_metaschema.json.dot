@@ -7,7 +7,7 @@
       "properties": {
         {{~ it.instructions:inst }}
           {{ var ev = inst.evaluate; }}
-          "{{=ev.keyword}}": {
+          "{{=ev.validatorKeyword}}": {
             {{?ev.title}}"title": "{{=ev.title}}",{{?}}
             {{?ev.description}}"description": "{{=ev.description}}",{{?}}
             "constant": true

@@ -4,7 +4,7 @@
   "keywords": ["$exec", "$method", "$args"],
   "required": ["$exec"],
   "evaluate": {
-    "keyword": "callExec",
+    "validatorKeyword": "eval$exec",
     "title": "$exec call",
     "description": "call function or method in $exec instruction; keyword should replace the instruction with synchronous or asynchronous value"
   },

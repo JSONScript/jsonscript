@@ -6,18 +6,23 @@
   "required": [ "name", "description", "keywords", "required", "evaluate", "schema" ],
   "additionalProperties": false,
   "properties": {
-    "name": { "$ref": "#scriptKeyword" },
+    "name": {
+      "decription": "instruction name, should be the same as the main instruction keyword",
+      "$ref": "#scriptKeyword"
+    },
     "description": {
       "type": "string",
       "minLength": 1
     },
     "keywords": {
+      "desription": "all allowed instruction keywords",
       "allOf": [
         { "$ref": "#keywordsArray" },
         { "contains": { "constant": { "$data": "2/name" } } }
       ]
     },
     "required": {
+      "desription": "required instruction keywords",
       "allOf": [
         { "$ref": "#keywordsArray" },
         { "contains": { "constant": { "$data": "2/name" } } }
@@ -25,12 +30,20 @@
     },
     "evaluate": {
       "type": "object",
-      "required": [ "keyword" ],
+      "required": [ "validatorKeyword" ],
       "properties": {
-        "keyword": {
+        "keywords": {
+          "description": "keywords that should be evaluated before validator keyword is called. If this property is absent, all keywords will be evaluated (in parallel)",
+          "allOf": [
+            { "$ref": "#keywordsArray" },
+            { "contains": { "constant": { "$data": "3/name" } } }
+          ]
+        },
+        "validatorKeyword": {
+          "description": "the custom 'validation' keyword that should be defined in the validator that evaluates the script",
           "type": "string",
           "minLength": 1,
-          "pattern": "^[A-Za-z]+$"
+          "pattern": "^[a-z_$][a-z0-9_$]*$"
         },
         "title": {
           "type": "string"
@@ -41,6 +54,7 @@
       }
     },
     "schema": {
+      "description": "the schemas for evaluated values of instruction keywords",
       "type": "object",
       "patternProperties": {
         "^\\$[a-z]": { "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#" }
@@ -51,6 +65,7 @@
   "definitions": {
     "scriptKeyword": {
       "id": "#scriptKeyword",
+      "description": "$ character + lowercase identifier",
       "type": "string",
       "pattern": "^\\$[a-z]+$"
     },

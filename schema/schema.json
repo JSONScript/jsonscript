@@ -53,6 +53,27 @@
       ]
     },
     {
+      "title": "$if",
+      "description": "conditional evaluation",
+      "type": "object",
+      "properties": {
+        "$if": {
+          "$ref": "#"
+        },
+        "$then": {
+          "$ref": "#"
+        },
+        "$else": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$if",
+        "$then"
+      ]
+    },
+    {
       "description": "scripts in the object are executed in parallel, property names should not start with $",
       "type": "object",
       "patternProperties": {

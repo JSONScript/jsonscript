@@ -7,19 +7,24 @@
     },
     {
       "properties": {
-        "callExec": {
+        "eval$exec": {
           "title": "$exec call",
           "description": "call function or method in $exec instruction; keyword should replace the instruction with synchronous or asynchronous value",
           "constant": true
         },
-        "getRef": {
+        "eval$ref": {
           "title": "$ref to the part of the script",
           "description": "Keyword should replace $ref instruction with the result of the script evaluation at this position",
           "constant": true
         },
-        "getData": {
+        "eval$data": {
           "title": "$data reference to the part of the data instance",
           "description": "Keyword should replace $data instruction with the data value at the position defined by JSON-pointer",
+          "constant": true
+        },
+        "eval$if": {
+          "title": "$if/$then/$else",
+          "description": "evaluates $if, if it is true - instruction evaluates to the result of $then evaluation ($else is skipped), if it is false - evaluates to $else ($then is skipped), otherwise throws an exception. If $if is false and $else is not defined it evaluates to null",
           "constant": true
         },
         "validateAsync": {

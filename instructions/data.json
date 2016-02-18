@@ -4,17 +4,14 @@
   "keywords": ["$data"],
   "required": ["$data"],
   "evaluate": {
-    "keyword": "getData",
+    "validatorKeyword": "eval$data",
     "title": "$data reference to the part of the data instance",
     "description": "Keyword should replace $data instruction with the data value at the position defined by JSON-pointer"
   },
   "schema": {
     "$data": {
       "type": "string",
-      "anyOf": [
-        { "format": "json-pointer" },
-        { "format": "relative-json-pointer" }
-      ]
+      "format": "json-pointer"
     }
   }
 }

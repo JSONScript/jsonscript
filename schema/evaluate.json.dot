@@ -7,29 +7,35 @@
     {
       "if": { "type": "object" },
       "then": {
-        "title": "parallel execution or script command",
-        "description": "evaluates all properties in parallel or executes script command (its keywords are evaluated in parallel too)",
-        "allOf":[
-          {
-            "title": "evaluate properties",
-            "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned synchronous or asynchronous value",
-            "additionalProperties": { "$ref": "#" }
-          },
-          {
-            "title": "object to [async] value",
-            "description": "Merge object properties into a single [asynchronous] object value",
-            "objectToAsync": true
-          },
-          {
-            "title": "execute instruction",
-            "description": "executes supported script instructions",
-            "validateAsync": {
-              "switch": [
-                {{~ it.instructions:inst:i }}
-                  {{?i}},{{?}}
+        "switch": [
+          {{~ it.instructions:inst }}
+            {
+              "if": { "required": [ "{{=inst.name}}" ] },
+              "then": {
+                "allOf": [
                   {
-                    "if": { "required": [ "{{=inst.name}}" ] },
-                    "then": {
+                    "title": "evaluate properties",
+                    "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                    {{? inst.evaluate.keywords }}
+                      "properties": {
+                        {{~ inst.evaluate.keywords:keyword:i }}
+                          {{?i}},{{?}}
+                          "{{=keyword}}": { "$ref": "#" }
+                        {{~}}
+                      }
+                    {{??}}
+                      "additionalProperties": { "$ref": "#" }
+                    {{?}}
+                  },
+                  {
+                    "title": "object to [async] value",
+                    "description": "Merge object properties into a single [asynchronous] object value",
+                    "objectToAsync": true
+                  },
+                  {
+                    "title": "execute instruction",
+                    "description": "executes supported script instructions",
+                    "validateAsync": {
                       "allOf": [
                         {
                           "description": "valdate evaluated instruction keywords",
@@ -37,12 +43,28 @@
                         },
                         {
                           "description": "execute instruction using custom keyword",
-                          "{{=inst.evaluate.keyword}}": true
+                          "{{=inst.evaluate.validatorKeyword}}": true
                         }
                       ]
                     }
                   }
-                {{~}}
+                ]
+              }
+            },
+          {{~}}
+          {
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "additionalProperties": { "$ref": "#" }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                }
               ]
             }
           }

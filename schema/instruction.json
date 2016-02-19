@@ -1,0 +1,80 @@
+{
+  "id": "http://json-script.com/schema/instruction.json#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "description": "schema for instruction definition",
+  "type": "object",
+  "required": [ "name", "description", "keywords", "required", "evaluate", "schema" ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "decription": "instruction name, should be the same as the main instruction keyword",
+      "$ref": "#scriptKeyword"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keywords": {
+      "desription": "all allowed instruction keywords",
+      "allOf": [
+        { "$ref": "#keywordsArray" },
+        { "contains": { "constant": { "$data": "2/name" } } }
+      ]
+    },
+    "required": {
+      "desription": "required instruction keywords",
+      "allOf": [
+        { "$ref": "#keywordsArray" },
+        { "contains": { "constant": { "$data": "2/name" } } }
+      ]
+    },
+    "evaluate": {
+      "type": "object",
+      "required": [ "validatorKeyword" ],
+      "properties": {
+        "keywords": {
+          "description": "keywords that should be evaluated before validator keyword is called. If this property is absent, all keywords will be evaluated (in parallel)",
+          "allOf": [
+            { "$ref": "#keywordsArray" },
+            { "contains": { "constant": { "$data": "3/name" } } }
+          ]
+        },
+        "validatorKeyword": {
+          "description": "the custom 'validation' keyword that should be defined in the validator that evaluates the script",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z_$][a-z0-9_$]*$"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "schema": {
+      "description": "the schemas for evaluated values of instruction keywords",
+      "type": "object",
+      "patternProperties": {
+        "^\\$[a-z]": { "$ref": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "scriptKeyword": {
+      "id": "#scriptKeyword",
+      "description": "$ character + lowercase identifier",
+      "type": "string",
+      "pattern": "^\\$[a-z]+$"
+    },
+    "keywordsArray": {
+      "id": "#keywordsArray",
+      "type": "array",
+      "items": { "$ref": "#scriptKeyword" },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}

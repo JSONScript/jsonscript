@@ -1,0 +1,103 @@
+{
+  "id": "http://json-script.com/schema/schema.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "JSONScript schema",
+  "description": "JSONScript script with instructions (generated from template)",
+  "anyOf": [
+    {
+      "title": "$exec",
+      "description": "call to external object, $exec and $method values should evaluate to a string",
+      "type": "object",
+      "properties": {
+        "$exec": {
+          "$ref": "#"
+        },
+        "$method": {
+          "$ref": "#"
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$exec"
+      ]
+    },
+    {
+      "title": "$ref",
+      "description": "data/script from the current script using absolute/relative JSON-pointer expression",
+      "type": "object",
+      "properties": {
+        "$ref": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$ref"
+      ]
+    },
+    {
+      "title": "$data",
+      "description": "data from the data instance using JSON-pointer expression, $data value should evalute to a string before the expression is evaluated",
+      "type": "object",
+      "properties": {
+        "$data": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$data"
+      ]
+    },
+    {
+      "title": "$if",
+      "description": "conditional evaluation",
+      "type": "object",
+      "properties": {
+        "$if": {
+          "$ref": "#"
+        },
+        "$then": {
+          "$ref": "#"
+        },
+        "$else": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$if",
+        "$then"
+      ]
+    },
+    {
+      "description": "scripts in the object are executed in parallel, property names should not start with $",
+      "type": "object",
+      "patternProperties": {
+        "^[^$]": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "description": "scripts in array are executed sequentially",
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
+    },
+    {
+      "description": "scalar values are also valid JSONScript",
+      "type": [
+        "string",
+        "number",
+        "boolean",
+        "null"
+      ]
+    }
+  ]
+}

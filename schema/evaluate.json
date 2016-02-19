@@ -1,0 +1,245 @@
+{
+  "id": "http://json-script.com/schema/evaluate.json#",
+  "$schema": "http://json-script.com/schema/evaluate_metaschema.json#",
+  "title": "JSONScript evaluation schema",
+  "description": "Schema with custom keywords that evaluates JSON script. It assumes that the script is valid",
+  "switch": [
+    {
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "switch": [
+          {
+            "if": {
+              "required": [
+                "$exec"
+              ]
+            },
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "additionalProperties": {
+                    "$ref": "#"
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                },
+                {
+                  "title": "execute instruction",
+                  "description": "executes supported script instructions",
+                  "validateAsync": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$exec": {
+                            "type": "string",
+                            "anyOf": [
+                              {
+                                "pattern": "[A-Za-z_$][A-Za-z_$0-9]+"
+                              },
+                              {
+                                "format": "uuid"
+                              }
+                            ]
+                          },
+                          "$method": {
+                            "type": "string",
+                            "pattern": "[A-Za-z_$][A-Za-z_$0-9]+"
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "eval$exec": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "$ref"
+              ]
+            },
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "additionalProperties": {
+                    "$ref": "#"
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                },
+                {
+                  "title": "execute instruction",
+                  "description": "executes supported script instructions",
+                  "validateAsync": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$ref": {
+                            "type": "string",
+                            "anyOf": [
+                              {
+                                "format": "json-pointer"
+                              },
+                              {
+                                "format": "relative-json-pointer"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "eval$ref": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "$data"
+              ]
+            },
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "additionalProperties": {
+                    "$ref": "#"
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                },
+                {
+                  "title": "execute instruction",
+                  "description": "executes supported script instructions",
+                  "validateAsync": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$data": {
+                            "type": "string",
+                            "format": "json-pointer"
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "eval$data": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "if": {
+              "required": [
+                "$if"
+              ]
+            },
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "properties": {
+                    "$if": {
+                      "$ref": "#"
+                    }
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                },
+                {
+                  "title": "execute instruction",
+                  "description": "executes supported script instructions",
+                  "validateAsync": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$if": {
+                            "type": "boolean"
+                          },
+                          "$else": {
+                            "default": null
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "eval$if": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all properties using the same schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "additionalProperties": {
+                    "$ref": "#"
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "title": "sequential execution",
+        "description": "queues items so that the next items is executed only after the previous asynchronous value receives data",
+        "itemsSerial": {
+          "$ref": "#"
+        }
+      }
+    }
+  ]
+}

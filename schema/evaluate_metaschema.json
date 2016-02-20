@@ -33,8 +33,8 @@
           "constant": true
         },
         "validateAsync": {
-          "title": "'promise' validation",
-          "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",
+          "title": "'asynchronous' validation",
+          "description": "Validates resolved asynchronous value and replaces the data with another asynchronous value. If the data is synchronous validates it immediately. Please note that the keyword itself executes synchronously.",
           "$ref": "#"
         },
         "objectToAsync": {
@@ -44,8 +44,13 @@
         },
         "itemsSerial": {
           "title": "sequential evaluation",
-          "description": "Keyword should replace the array with the promise that resolves to array of results, but instructions should only be executed after the previous one completes",
+          "description": "Keyword should replace the array with the asynchronous value that resolves to array of results, but instructions should only be executed after the previous one resolves",
           "$ref": "#"
+        },
+        "resolvePendingRefs": {
+          "title": "resolve references",
+          "description": "after each part of the script is evaluated, the references pointing to it and its subparts are resolved",
+          "constant": true
         }
       }
     }

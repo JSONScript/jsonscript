@@ -27,6 +27,11 @@
           "description": "evaluates $if, if it is true - instruction evaluates to the result of $then evaluation ($else is skipped), if it is false - evaluates to $else ($then is skipped), otherwise throws an exception. If $if is false and $else is not defined it evaluates to null",
           "constant": true
         },
+        "eval$delay": {
+          "title": "delayed script evaluation",
+          "description": "evaluates script in $delay after the delay of $wait milliseconds (default is 0)",
+          "constant": true
+        },
         "validateAsync": {
           "title": "'promise' validation",
           "description": "Validates the resolved value of the 'promise' and replaces the data with chained 'promise'. If the date is not a promise validates it immediately. Please not that the keyword itself executes synchronously.",

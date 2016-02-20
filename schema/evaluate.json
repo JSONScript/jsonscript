@@ -209,6 +209,52 @@
             }
           },
           {
+            "if": {
+              "required": [
+                "$delay"
+              ]
+            },
+            "then": {
+              "allOf": [
+                {
+                  "title": "evaluate properties",
+                  "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                  "properties": {
+                    "$wait": {
+                      "$ref": "#"
+                    }
+                  }
+                },
+                {
+                  "title": "object to [async] value",
+                  "description": "Merge object properties into a single [asynchronous] object value",
+                  "objectToAsync": true
+                },
+                {
+                  "title": "execute instruction",
+                  "description": "executes supported script instructions",
+                  "validateAsync": {
+                    "allOf": [
+                      {
+                        "description": "valdate evaluated instruction keywords",
+                        "properties": {
+                          "$wait": {
+                            "type": "integer",
+                            "default": 0
+                          }
+                        }
+                      },
+                      {
+                        "description": "execute instruction using custom keyword",
+                        "eval$delay": true
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
             "then": {
               "allOf": [
                 {

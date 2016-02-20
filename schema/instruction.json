@@ -35,8 +35,7 @@
         "keywords": {
           "description": "keywords that should be evaluated before validator keyword is called. If this property is absent, all keywords will be evaluated (in parallel)",
           "allOf": [
-            { "$ref": "#keywordsArray" },
-            { "contains": { "constant": { "$data": "3/name" } } }
+            { "$ref": "#keywordsArray" }
           ]
         },
         "validatorKeyword": {

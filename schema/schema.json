@@ -74,6 +74,23 @@
       ]
     },
     {
+      "title": "$delay",
+      "description": "delayed script evaluation",
+      "type": "object",
+      "properties": {
+        "$delay": {
+          "$ref": "#"
+        },
+        "$wait": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$delay"
+      ]
+    },
+    {
       "description": "scripts in the object are executed in parallel, property names should not start with $",
       "type": "object",
       "patternProperties": {

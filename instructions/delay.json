@@ -1,0 +1,18 @@
+{
+  "name": "$delay",
+  "description": "delayed script evaluation",
+  "keywords": ["$delay", "$wait"],
+  "required": ["$delay"],
+  "evaluate": {
+    "keywords": ["$wait"],
+    "validatorKeyword": "eval$delay",
+    "title": "delayed script evaluation",
+    "description": "evaluates script in $delay after the delay of $wait milliseconds (default is 0)"
+  },
+  "schema": {
+    "$wait": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

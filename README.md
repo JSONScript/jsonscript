@@ -6,6 +6,8 @@ JSONScript is created to manage scripted execution in remote systems to avoid th
 
 It's work in progress.
 
+[![Build Status](https://travis-ci.org/JSONScript/jsonscript.svg?branch=master)](https://travis-ci.org/JSONScript/jsonscript)
+
 
 ## Features
 

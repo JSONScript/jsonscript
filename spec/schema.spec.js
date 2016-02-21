@@ -5,8 +5,7 @@ var jsonSchemaTest = require('json-schema-test')
 
 var ajv = Ajv({ allErrors: true, v5: true });
 ajv.addSchema(require('../schema/schema'));
-ajv.addMetaSchema(require('../schema/evaluate_metaschema'));
-ajv.addSchema(require('../schema/evaluate'));
+ajv.addSchema(require('../schema/schema_strict'));
 
 
 jsonSchemaTest([ ajv ], {

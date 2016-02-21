@@ -1,0 +1,81 @@
+[
+  {
+    "description": "$data - reference to the data object",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$data" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$data" }
+    ],
+    "tests": [
+      {
+        "description": "value should be a valid JSON-pointer",
+        "data": { "$data": "/foo/bar" },
+        "valid": true
+      },
+      {
+        "description": "value can be any valid script",
+        "data": { "$data": { "$exec": "func" } },
+        "valid": true
+      },
+      {
+        "description": "value can be another $data instruction",
+        "data": { "$data": { "$data": "/foo/bar" } },
+        "valid": true
+      },
+      {
+        "description": "if value is invalid script then invalid",
+        "data": { "$data": { "$exec": "func", "extra": {} } },
+        "valid": false
+      }
+    ]    
+  },
+  {
+    "description": "$data syntax errors",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$data" }
+    ],
+    "tests": [
+      {
+        "description": "relative JSON-pointer is invalid",
+        "data": { "$data": "1/foo/bar" },
+        "valid": true
+      },
+      {
+        "description": "invalid JSON-pointer is invalid",
+        "data": { "$data": "foo" },
+        "valid": true
+      },
+      {
+        "description": "$data is scalar but not a string is invalid",
+        "data": { "$data": 1 },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$data syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$data" }
+    ],
+    "tests": [
+      {
+        "description": "relative JSON-pointer is invalid",
+        "data": { "$data": "1/foo/bar" },
+        "valid": false
+      },
+      {
+        "description": "invalid JSON-pointer is invalid",
+        "data": { "$data": "foo" },
+        "valid": false
+      },
+      {
+        "description": "$data is scalar but not a string is invalid",
+        "data": { "$data": 1 },
+        "valid": false
+      }
+    ]
+  }
+]

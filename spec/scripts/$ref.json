@@ -1,0 +1,76 @@
+[
+  {
+    "description": "$ref - reference to the script being evaluated",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$ref" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$ref" }
+    ],
+    "tests": [
+      {
+        "description": "value should be a valid JSON-pointer",
+        "data": { "$ref": "/foo/bar" },
+        "valid": true
+      },
+      {
+        "description": "relative JSON-pointer is valid",
+        "data": { "$ref": "1/foo/bar" },
+        "valid": true
+      },
+      {
+        "description": "value can be any valid script",
+        "data": { "$ref": { "$exec": "func" } },
+        "valid": true
+      },
+      {
+        "description": "value can be another $ref instruction",
+        "data": { "$ref": { "$ref": "/foo/bar" } },
+        "valid": true
+      },
+      {
+        "description": "if value is invalid script then invalid",
+        "data": { "$ref": { "$exec": "func", "extra": {} } },
+        "valid": false
+      }
+    ]    
+  },
+  {
+    "description": "$if syntax errors",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$ref" }
+    ],
+    "tests": [
+      {
+        "description": "invalid JSON-pointer is invalid",
+        "data": { "$ref": "foo" },
+        "valid": true
+      },
+      {
+        "description": "$ref is scalar but not a string",
+        "data": { "$ref": 1 },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$if syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$ref" }
+    ],
+    "tests": [
+      {
+        "description": "invalid JSON-pointer is invalid",
+        "data": { "$ref": "foo" },
+        "valid": false
+      },
+      {
+        "description": "$ref is scalar but not a string",
+        "data": { "$ref": 1 },
+        "valid": false
+      }
+    ]
+  }
+]

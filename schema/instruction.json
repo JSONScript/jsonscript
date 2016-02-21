@@ -3,7 +3,7 @@
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "description": "schema for instruction definition",
   "type": "object",
-  "required": [ "name", "description", "keywords", "required", "evaluate", "schema" ],
+  "required": [ "name", "description", "keywords", "required", "evaluate" ],
   "additionalProperties": false,
   "properties": {
     "name": {

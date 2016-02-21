@@ -1,0 +1,97 @@
+[
+  {
+    "description": "$if - conditional evaluation",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$if" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$if" }
+    ],
+    "tests": [
+      {
+        "description": "$if/$then/$else can be any scripts",
+        "data": {
+          "$if": { "$data": "/cond" },
+          "$then": { "$exec": "foo"},
+          "$else": { "$exec": "bar" }
+        },
+        "valid": true
+      },
+      {
+        "description": "$else is optional (it is null by default)",
+        "data": {
+          "$if": { "$data": "/cond" },
+          "$then": { "$exec": "foo"}
+        },
+        "valid": true
+      },
+      {
+        "description": "additional properties are invalid",
+        "data": {
+          "$if": { "$data": "/cond" },
+          "$then": { "$exec": "foo"},
+          "extra": {}
+        },
+        "valid": false
+      },
+      {
+        "description": "$if as boolean is valid",
+        "data": {
+          "$if": true,
+          "$then": { "$exec": "foo"}
+        },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$if syntax errors",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$if" }
+    ],
+    "tests": [
+      {
+        "description": "$if as string is invalid",
+        "data": {
+          "$if": "true",
+          "$then": { "$exec": "foo"}
+        },
+        "valid": true
+      },
+      {
+        "description": "$if as scalar non-boolean is invalid",
+        "data": {
+          "$if": 1,
+          "$then": { "$exec": "foo"}
+        },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$if syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$if" }
+    ],
+    "tests": [
+      {
+        "description": "$if as string is invalid",
+        "data": {
+          "$if": "true",
+          "$then": { "$exec": "foo"}
+        },
+        "valid": false
+      },
+      {
+        "description": "$if as scalar non-boolean is invalid",
+        "data": {
+          "$if": 1,
+          "$then": { "$exec": "foo"}
+        },
+        "valid": false
+      }
+    ]
+  }
+]

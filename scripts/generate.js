@@ -5,15 +5,18 @@ var doT = require('dot');
 var instructions = require('../instructions');
 
 generateSchema('schema');
+generateSchema('schema', true);
 generateSchema('evaluate');
 generateSchema('evaluate_metaschema');
 
 
-function generateSchema(schemaName) {
+function generateSchema(schemaName, strictSchema) {
   var template = getSchemaTemplate(schemaName);
-  var schemaStr = template({ instructions: instructions });
+  var schemaStr = template({ instructions: instructions, strictSchema: strictSchema });
   schemaStr = JSON.stringify(JSON.parse(schemaStr), null, '  ');
-  fs.writeFileSync(getFileName(schemaName), schemaStr);
+  var schemaFile = getFileName(schemaName);
+  if (strictSchema) schemaFile = schemaFile.replace('.json', '_strict.json');
+  fs.writeFileSync(schemaFile, schemaStr);
 }
 
 

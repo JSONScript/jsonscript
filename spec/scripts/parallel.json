@@ -1,0 +1,38 @@
+[
+  {
+    "description": "parallel evaluation",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#parallel" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#parallel" }
+    ],
+    "tests": [
+      {
+        "description": "object with scripts is valid",
+        "data": {
+          "foo": { "$exec": "foo" },
+          "bar": { "$exec": "bar" },
+          "baz": 3
+        },
+        "valid": true
+      },
+      {
+        "description": "object with invalid scripts is invalid",
+        "data": {
+          "foo": { "$exec": "foo", "$extra": {} },
+          "bar": { "$exec": "bar" }
+        },
+        "valid": false
+      },
+      {
+        "description": "properties starting with $ is invalid",
+        "data": {
+          "$foo": { "$exec": "foo" },
+          "bar": { "$exec": "bar" }
+        },
+        "valid": false
+      }
+    ]
+  }
+]

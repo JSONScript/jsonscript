@@ -1,25 +1,54 @@
 {
-  "id": "http://json-script.com/schema/schema.json#",
+  "id": "http://json-script.com/schema/schema{{?it.strictSchema}}_strict{{?}}.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",
   "anyOf": [
     {{~ it.instructions:inst }}
-      {
+      { "$ref": "#{{=inst.name}}" }, 
+    {{~}}
+    { "$ref": "#parallel" },
+    { "$ref": "#sequential" },
+    { "$ref": "#scalar" }
+  ],
+  "definitions": {
+    {{~ it.instructions:inst }}
+      "_{{=inst.name}}": {
+        "id": "#{{=inst.name}}",
         "title": "{{=inst.name}}",
         "description": "{{=inst.description}}",
         "type": "object",
         "properties": {
           {{~ inst.keywords:keyword:i }}
             {{?i}},{{?}}
-            "{{=keyword}}": { "$ref": "#" }
+            {{
+              var keywordSch = inst.schema && inst.schema[keyword]
+                , validateScalarType = it.strictSchema && keywordSch && typeof keywordSch.type == 'string' &&
+                              ['string', 'number', 'integer', 'boolean', 'null'].indexOf(keywordSch.type) >= 0;
+            }}
+            {{? validateScalarType }}
+              "{{=keyword}}": {
+                "anyOf": [
+                  {{= JSON.stringify(inst.schema[keyword]) }},
+                  {
+                    "allOf": [
+                      { "type": [ "object", "array" ] },
+                      { "$ref": "#" }        
+                    ]
+                  }
+                ]
+              }
+            {{??}}
+              "{{=keyword}}": { "$ref": "#" }
+            {{?}}
           {{~}}
         },
         "additionalProperties": false,
         "required": {{= JSON.stringify(inst.required) }}
       },
     {{~}}
-    {
+    "parallel": {
+      "id": "#parallel",
       "description": "scripts in the object are executed in parallel, property names should not start with $",
       "type": "object",
       "patternProperties": {
@@ -27,14 +56,16 @@
       },
       "additionalProperties": false
     },
-    {
+    "sequential": {
+      "id": "#sequential",
       "description": "scripts in array are executed sequentially",
       "type": "array",
       "items": { "$ref": "#" }
     },
-    {
+    "scalar": {
+      "id": "#scalar",
       "description": "scalar values are also valid JSONScript",
-      "type": [ "string", "number", "boolean", "null" ]
+      "type": [ "string", "number", "integer", "boolean", "null" ]      
     }
-  ]
+  }
 }

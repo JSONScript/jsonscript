@@ -12,13 +12,13 @@
     "$exec": {
       "type": "string",
       "anyOf": [
-        { "pattern": "[A-Za-z_$][A-Za-z_$0-9]+" },
+        { "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$" },
         { "format": "uuid" }
       ]
     },
     "$method": {
       "type": "string",
-      "pattern": "[A-Za-z_$][A-Za-z_$0-9]+"
+      "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
     }
   }
 }

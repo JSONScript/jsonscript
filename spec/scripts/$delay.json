@@ -1,0 +1,61 @@
+[
+  {
+    "description": "$delay - delayed script execution",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$delay" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$delay" }
+    ],
+    "tests": [
+      {
+        "description": "$delay value is any valid script",
+        "data": { "$delay": { "$exec": "foo" } },
+        "valid": true
+      },
+      {
+        "description": "$delay with invalid script is invalid",
+        "data": { "$delay": { "$exec": "foo", "extra": {} } },
+        "valid": false
+      },
+      {
+        "description": "optional $wait should evaluate to integer (milliseconds)",
+        "data": { "$delay": { "$exec": "foo" }, "$wait": 20 },
+        "valid": true
+      },
+      {
+        "description": "$wait can be any script (object/array)",
+        "data": { "$delay": { "$exec": "foo" }, "$wait": { "$exec": "bar" } },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$delay syntax errors",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$delay" }
+    ],
+    "tests": [
+      {
+        "description": "$wait cannot be scalar non-integer",
+        "data": { "$delay": { "$exec": "foo" }, "$wait": "20" },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$delay syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$delay" }
+    ],
+    "tests": [
+      {
+        "description": "$wait cannot be scalar non-integer",
+        "data": { "$delay": { "$exec": "foo" }, "$wait": "20" },
+        "valid": false
+      }
+    ]
+  }
+]

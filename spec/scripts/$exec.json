@@ -1,7 +1,12 @@
 [
   {
-    "description": "$exec call",
-    "schema": { "$ref": "http://json-script.com/schema/schema.json" },
+    "description": "$exec - call to external executor",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$exec" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$exec" }
+    ],
     "tests": [
       {
         "description": "with method and args",
@@ -89,6 +94,64 @@
             }
           ]
         },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "$exec syntax errors",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema.json#" },
+      { "$ref": "http://json-script.com/schema/schema.json#$exec" }
+    ],
+    "tests": [
+      {
+        "description": "$exec is scalar but not a string",
+        "data": { "$exec": 1 },
+        "valid": true
+      },
+      {
+        "description": "$exec is invalid identifier",
+        "data": { "$exec": "foo%bar" },
+        "valid": true
+      },
+      {
+        "description": "$method is scalar but not a string",
+        "data": { "$exec": "foo", "$method": 1 },
+        "valid": true
+      },
+      {
+        "description": "$method is invalid identifier",
+        "data": { "$exec": "foo", "$method": "%bar" },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$exec syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://json-script.com/schema/schema_strict.json#$exec" }
+    ],
+    "tests": [
+      {
+        "description": "$exec is scalar but not a string",
+        "data": { "$exec": 1 },
+        "valid": false
+      },
+      {
+        "description": "$exec is invalid identifier",
+        "data": { "$exec": "foo%bar" },
+        "valid": false
+      },
+      {
+        "description": "$method is scalar but not a string",
+        "data": { "$exec": "foo", "$method": 1 },
+        "valid": false
+      },
+      {
+        "description": "$method is invalid identifier",
+        "data": { "$exec": "foo", "$method": "%bar" },
         "valid": false
       }
     ]

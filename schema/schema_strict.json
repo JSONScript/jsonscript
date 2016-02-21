@@ -1,5 +1,5 @@
 {
-  "id": "http://json-script.com/schema/schema.json#",
+  "id": "http://json-script.com/schema/schema_strict.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",
@@ -37,10 +37,53 @@
       "type": "object",
       "properties": {
         "$exec": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "string",
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+                },
+                {
+                  "format": "uuid"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         },
         "$method": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         },
         "$args": {
           "$ref": "#"
@@ -58,7 +101,32 @@
       "type": "object",
       "properties": {
         "$ref": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "string",
+              "anyOf": [
+                {
+                  "format": "json-pointer"
+                },
+                {
+                  "format": "relative-json-pointer"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         }
       },
       "additionalProperties": false,
@@ -73,7 +141,25 @@
       "type": "object",
       "properties": {
         "$data": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "json-pointer"
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         }
       },
       "additionalProperties": false,
@@ -88,7 +174,24 @@
       "type": "object",
       "properties": {
         "$if": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         },
         "$then": {
           "$ref": "#"
@@ -113,7 +216,25 @@
           "$ref": "#"
         },
         "$wait": {
-          "$ref": "#"
+          "anyOf": [
+            {
+              "type": "integer",
+              "default": 0
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
         }
       },
       "additionalProperties": false,

@@ -44,3 +44,8 @@ At the same time JSONScript allows keeping the remote system completely secure a
 ## Script execution
 
 As the script executes, each instruction returns some data. By default this data replaces the script itself and all results will be available to the interpreter to pass back to the host system that requested execution. Host system usually sends results back to the client, but can do anything else with them, e.g. logging, storing to the database, etc.).
+
+
+## Language
+
+See [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md)

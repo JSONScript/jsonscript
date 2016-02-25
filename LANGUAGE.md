@@ -14,7 +14,7 @@ The simplest script in JSONScript is a single instruction that calls an external
 
 The executor is any object that is provided to the JSONScript interpreter by the environment it executes in. The executor is defined by its name that is either an identifier or UUID (UUIDs are used for temporary external objects that can be created in the process of script evaluation).
 
-In the example above it is an object with the name "router" (the value of the keyword "$exec") that has different methods including "get" (the value of the keyword "$method").
+In the example above it is an object with the name `"router"` (the value of the keyword `$exec`) that has different methods including `"get"` (the value of the keyword `$method`).
 
 When this simple script is evaluated its value will be the resolved value that the executor returns. See [Synchronous and asynchronous values](#synchronous-and-asynchronous-values).
 
@@ -118,7 +118,7 @@ JSONScript can include several instructions that will be executed in parallel:
 
 The meaning of "parallel" depends on the environment in which the script executes and on the interpreter implementation. The implementation should not guarantee any order in which evaluation of individual scripts will start, and instructions don't wait until another instruction evaluates (and resolves) to begin executing.
 
-The example above retrieves the values fo two resources. The result of the evaluation of the whole script above is a single asynchronous value (assuming that instructions return asynchronous values) that resolves into the object with the results of both instructions available in properties "res1" and "res2".
+The example above retrieves the values fo two resources. The result of the evaluation of the whole script above is a single asynchronous value (assuming that instructions return asynchronous values) that resolves into the object with the results of both instructions available in properties `"res1"` and `"res2"`.
 
 The names of properties in the object can be any strings that do NOT start with "$" (properties that stat with "$" are resolved fot the instruction keywords).
 
@@ -155,9 +155,9 @@ For example, the script below is similar to the example in the previous section 
 }
 ```
 
-This example combines parallel and sequential evaluation. Each resource update only starts after the current value is retrieved, but the update of "/resource/2" does not need to wait until the "/resource/1" finished updating.
+This example combines parallel and sequential evaluation. Each resource update only starts after the current value is retrieved, but the update of `"/resource/2"` does not need to wait until the `"/resource/1"` finished updating.
 
-The result of this script evaluation is the object with two properties "res1" and "res2" each containing two items with the results of individual instructions.
+The result of this script evaluation is the object with two properties `"res1"` and `"res2"` each containing two items with the results of individual instructions.
 
 You can see how by combining individual instruction calls, sequential and parallel evaluation you can build advanced scripts.
 
@@ -178,7 +178,7 @@ During the evaluation the script can use the data instance passed to the interpe
   {
     "$exec": "router",
     "$method": "put",
-    "$args": { "path": { "$data": "/path" }, "body": { "$data": "/body" } }
+    "$args": { "$data": "" }
   }
 ]
 ```
@@ -192,11 +192,59 @@ Data instance:
 }
 ```
 
-The instruction to get data has a single keyword "$data" that is a JSON-pointer to the part of the passed data instance.
+The instruction to get data has a single keyword `$data` that is a JSON-pointer to the part of the passed data instance.
 
-"$data" allows to separate the passed data from the script in this way avoiding repetition and making the scripts reusable.
+`$data` allows to separate the passed data from the script in this way avoiding repetition and making the scripts reusable.
 
 Not only some part of arguments can use scripts to evaluate it, any value in the script can be any other script as long as it is evaluated to the correct type of value.
 
+For example, the executor name can be the result of the call to another executor:
 
-## Accessing the parts of the current script with `$ref`.
+```JSON
+{
+  "$exec": { "$exec": "chooseRouter" },
+  "$method": "get",
+  "$args": { "path": { "$data": "/path" } }
+}
+```
+
+
+## Accessing the parts of the current script with `$ref`
+
+The script can use results from any part of the script in another part of the script with `$ref` instruction.
+
+The previous example where executor name was the result of another script evaluation could be re-written like this:
+
+```JSON
+{
+  "router": { "$exec": "chooseRouter" },
+  "response": {
+    "$exec": { "$ref": "2/router" },
+    "$method": "get",
+    "$args": { "path": { "$data": "/path" } }
+  }
+}
+```
+
+In this way the script will evaluate to the object that contains both the response and the name of the router that returned it.
+
+The value of `$ref` keyword should be an absolute or relative JSON-pointer.
+
+If an absolute JSON-pointer is used it means the pointer in the whole script object.
+
+The realtive JSON-pointer is the pointer relative to `$ref` instruction object, so `"0/"` means the instruction itself (it can't be evaluated though, see below), `"1/"` - the parent object etc.
+
+Although the example uses parallel processing, the second instruction will not start executing until the first one completes because references should always return evaluated values of the script, rather than the script itself.
+
+It is easy to create the script that will never evaluate:
+- two instructions using references to the results of each other.
+- the instruction in array (sequential processing) using the reference to the result of the next instruction.
+- the reference to itself or to the child of itself.
+
+JSONScript interpreters should both try to determine such situations as early as possible and to allow defining evaluation timeout(s).
+
+
+## Conditional evaluation with `$if`
+
+
+## Delayed evaluation with `$delay`

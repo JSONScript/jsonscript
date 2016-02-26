@@ -246,5 +246,64 @@ JSONScript interpreters should both try to determine such situations as early as
 
 ## Conditional evaluation with `$if`
 
+`$if` instruction can be used to choose the strict that will be evaluated based on some condition:
+
+```JSON
+{
+  "$if": { "$exec": "checkAvailability", "$args": "router1" },
+  "$then": {
+    "$exec": "router1",
+    "$method": "get",
+    "$args": { "path": "/resource/1" }
+  },
+  "$else": {
+    "$exec": "router2",
+    "$method": "get",
+    "$args": { "path": "/resource/1" }
+  }
+}
+```
+
+The result of the evaluation of the script in `$if` keyword should be a boolean value, otherwise the whole script will fail to evailuate (no type coercion is made).
+
+If the condition is `true` then the script in `$then` keyword will be evaluted and its result will be the result of `$if` instruction, otherwise the script in `$else` will be evaluated and `$if` evaluate to its result.
+
+Please note that the interpreter should NOT evaluate both scripts and choose the result - it should evaluate only one of the scripts.
+
+`$else` keyword is optional, if it is absent and the condition is `false`, `$if` will evaluate to `null`.
+
+Simple scalar values can be used in any place where the script is expected - they evaluate to themselves. We can refactor the script above in this way:
+
+```JSON
+{
+  "$exec": {
+    "$if": { "$exec": "checkAvailability", "$args": "router1" },
+    "$then": "router1",
+    "$else": "router2"
+  },
+  "$method": "get",
+  "$args": { "path": "/resource/1" }
+}
+```
+
+or using reference:
+
+```JSON
+{
+  "router": {
+    "$if": { "$exec": "checkAvailability", "$args": "router1" },
+    "$then": "router1",
+    "$else": "router2"
+  },
+  "response": {
+    "$exec": { "$ref": "2/router" },
+    "$method": "get",
+    "$args": { "path": "/resource/1" }
+  }
+}
+```
+
+ In the example above the `$if` instruction evaluates to `"router1"` or to `"router2"`, depending on the condition.
+
 
 ## Delayed evaluation with `$delay`

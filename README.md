@@ -49,3 +49,8 @@ As the script executes, each instruction returns some data. By default this data
 ## Language
 
 See [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md)
+
+
+## Implementation
+
+JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)

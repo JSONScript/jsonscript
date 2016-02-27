@@ -272,7 +272,7 @@ Please note that the interpreter should NOT evaluate both scripts and choose the
 
 `$else` keyword is optional, if it is absent and the condition is `false`, `$if` will evaluate to `null`.
 
-Simple scalar values can be used in any place where the script is expected - they evaluate to themselves. We can refactor the script above in this way:
+Scalar values can be used in any place where the script is expected - they evaluate to themselves. We can refactor the script above in this way:
 
 ```JSON
 {
@@ -303,7 +303,7 @@ or using reference:
 }
 ```
 
- In the example above the `$if` instruction evaluates to `"router1"` or to `"router2"`, depending on the condition.
+ In the examples above `$if` instruction evaluates to `"router1"` or to `"router2"`, depending on the condition. In the first case the script returns only `get` result, the result of the second script includes that name of executor that executed the method.
 
 
 ## Delayed evaluation with `$delay`

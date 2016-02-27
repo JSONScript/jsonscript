@@ -307,3 +307,42 @@ or using reference:
 
 
 ## Delayed evaluation with `$delay`
+
+`$delay` instruction can be used to delay the start of evaluation of any script. That can be useful, for example, if you need to ensure that one script starts evaluating after another script starts, but you don't need for it to wait for the completion (as in sequential processing):
+
+```JSON
+{
+  "res1": {
+    "$exec": "router",
+    "$method": "get",
+    "$args": { "path": "/resource/1" }
+  },
+  "res2": {
+    "$delay": {
+      "$exec": "router",
+      "$method": "get",
+      "$args": { "path": "/resource/2" }
+    },
+    "$wait": 50
+  }
+}
+```
+
+The evaluation result will be the same as without `$delay` istruction, but the second "$exec" instruction will start executing at least 50 milliseconds later than the first.
+
+This instruction can also be used to create asynchronous value from synchronous value. For example if some executor expects an asynchronous value as an argument and you want to pass a constant, you can use `$delay`:
+
+```JSON
+{
+  "$exec": "logger",
+  "$method": "resolve",
+  "$args": {
+    "message": "Resolved",
+    "asyncValue": { "$delay": "test", "$wait": 1000 }
+  }
+}
+```
+
+In the example above a hypothetical logger logs message when asynchronous value is resolved. `$delay` instruction result is an asynchrnous value that resolves 1 second after its evaluation with the value `"test"`.
+
+`$wait` keyword is optional, the default is 0. It means that the interpreter should schedule the script evaluation as soon as possible but do not execute it immediately.

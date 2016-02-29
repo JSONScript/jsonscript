@@ -1,5 +1,5 @@
 {
-  "id": "http://json-script.com/schema/instruction.json#",
+  "id": "http://www.json-script.com/schema/instruction.json#",
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "description": "schema for instruction definition",
   "type": "object",

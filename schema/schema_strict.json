@@ -1,5 +1,5 @@
 {
-  "id": "http://json-script.com/schema/schema_strict.json#",
+  "id": "http://www.json-script.com/schema/schema_strict.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",

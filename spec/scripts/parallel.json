@@ -2,10 +2,10 @@
   {
     "description": "parallel evaluation",
     "schemas": [
-      { "$ref": "http://json-script.com/schema/schema.json#" },
-      { "$ref": "http://json-script.com/schema/schema.json#parallel" },
-      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://json-script.com/schema/schema_strict.json#parallel" }
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#parallel" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#parallel" }
     ],
     "tests": [
       {

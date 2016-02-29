@@ -2,10 +2,10 @@
   {
     "description": "$if - conditional evaluation",
     "schemas": [
-      { "$ref": "http://json-script.com/schema/schema.json#" },
-      { "$ref": "http://json-script.com/schema/schema.json#$if" },
-      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://json-script.com/schema/schema_strict.json#$if" }
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$if" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$if" }
     ],
     "tests": [
       {
@@ -47,8 +47,8 @@
   {
     "description": "$if syntax errors",
     "schemas": [
-      { "$ref": "http://json-script.com/schema/schema.json#" },
-      { "$ref": "http://json-script.com/schema/schema.json#$if" }
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$if" }
     ],
     "tests": [
       {
@@ -72,8 +72,8 @@
   {
     "description": "$if syntax errors with strict schema",
     "schemas": [
-      { "$ref": "http://json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://json-script.com/schema/schema_strict.json#$if" }
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$if" }
     ],
     "tests": [
       {

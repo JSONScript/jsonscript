@@ -7,7 +7,6 @@ var instructions = require('../instructions');
 generateSchema('schema');
 generateSchema('schema', true);
 generateSchema('evaluate');
-generateSchema('evaluate_metaschema');
 
 
 function generateSchema(schemaName, strictSchema) {

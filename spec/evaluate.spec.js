@@ -6,8 +6,7 @@ var ajv = Ajv({ allErrors: true, v5: true });
 
 
 describe('evaluate schema', function() {
-  it('should be valid according to evaluate_metaschema and should compile', function() {
-    ajv.addMetaSchema(require('../schema/evaluate_metaschema'));
+  it('should be valid and should compile', function() {
     ajv.compile(require('../schema/evaluate'));
   });
 });

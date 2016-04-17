@@ -15,18 +15,27 @@
     {
       "page": "language",
       "linkText": "Language"
+    },
+    {
+      "page": "schema",
+      "linkText": "Schema"
     }
   ],
   "pages": [
     {
       "file": "README.md",
       "page": "index",
-      "title": "JSONScript - Platform independent asynchronous scripting language using JSON format"
+      "title": "JSONScript - Asynchronous scripting language using JSON format"
     },
     {
       "file": "LANGUAGE.md",
       "page": "language",
       "title": "JSONScript - Language Tutorial"
+    },
+    {
+      "file": "SCHEMA.md",
+      "page": "schema",
+      "title": "JSONScript - Schema"
     },
     {
       "file": "LICENSE",

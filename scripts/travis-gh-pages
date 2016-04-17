@@ -5,9 +5,10 @@ set -e
 if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then
   git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qE '\.md$|\.json$|^LICENSE$' && {
     rm -rf ../gh-pages
-    git clone -b gh-pages --single-branch https://${GITHUB_TOKEN}@github.com/epoberezkin/ajv.git ../gh-pages
+    git clone -b gh-pages --single-branch https://${GITHUB_TOKEN}@github.com/JSONScript/jsonscript.git ../gh-pages
     mkdir -p ../gh-pages/_source
     cp *.md ../gh-pages/_source
+    cp schema/*.json ../gh-pages/schema
     cp LICENSE ../gh-pages/_source
     currentDir=$(pwd)
     cd ../gh-pages

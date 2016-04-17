@@ -63,3 +63,8 @@ See [Schema](schema.html) for JSON-schemas for the script and for instruction de
 ## Implementation
 
 JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)
+
+
+## License
+
+[MIT](license.html)

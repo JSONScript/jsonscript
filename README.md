@@ -50,6 +50,11 @@ As the script executes, each instruction returns some data. By default this data
 See [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md)
 
 
+## Schema
+
+See [Schema](https://github.com/JSONScript/jsonscript/blob/master/SCHEMA.md) for JSON-schemas for the script and for instruction definitions.
+
+
 ## Implementation
 
 JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)

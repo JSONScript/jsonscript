@@ -9,9 +9,8 @@ Platform independent asynchronous and concurrent scripting language using JSON f
 
 JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests and unnecessary transfers of intermediary results.
 
-It's work in progress.
-
 [![Build Status](https://travis-ci.org/JSONScript/jsonscript.svg?branch=master)](https://travis-ci.org/JSONScript/jsonscript)
+[![npm version](https://badge.fury.io/js/jsonscript.svg)](https://www.npmjs.com/package/jsonscript)
 
 
 ## Features

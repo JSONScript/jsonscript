@@ -1,0 +1,19 @@
+<ul id="page_links">
+
+  <li>
+    {% if page.page_name == 'index' %}
+      <span class="current_page">Home</span>
+    {% else %}
+      <a href="/" title="Home">Home</a>
+    {% endif %}
+  </li>
+
+  <li>
+    {% if page.page_name == 'language' %}
+      <span class="current_page">Language</span>
+    {% else %}
+      <a href="/language.html" title="Language">Language</a>
+    {% endif %}
+  </li>
+
+</ul>

@@ -1,0 +1,37 @@
+{
+  "repository": "https://github.com/JSONScript/jsonscript",
+  "folders": {
+    "source": "_source",
+    "target": ".",
+    "site": ""
+  },
+  "layout": "main",
+  "navigation": [
+    {
+      "page": "index",
+      "linkText": "Home",
+      "home": true
+    },
+    {
+      "page": "language",
+      "linkText": "Language"
+    }
+  ],
+  "pages": [
+    {
+      "file": "README.md",
+      "page": "index",
+      "title": "JSONScript - Platform independent asynchronous scripting language using JSON format"
+    },
+    {
+      "file": "LANGUAGE.md",
+      "page": "language",
+      "title": "JSONScript - Language Tutorial"
+    },
+    {
+      "file": "LICENSE",
+      "page": "license",
+      "title": "JSONScript - License"
+    }
+  ]
+}

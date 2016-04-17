@@ -4,7 +4,7 @@
 
 The simplest script in JSONScript is a single instruction that calls an external executor method with some arguments:
 
-```JSON
+```json
 {
   "$exec": "router",
   "$method": "get",
@@ -40,7 +40,7 @@ An asynchronous value is a value that is currently not available and will be ava
 
 JSONScript can include several instructions that will be executed sequentially:
 
-```JSON
+```json
 [
   {
     "$exec": "router",
@@ -65,7 +65,7 @@ Sequential evaluation is not limited to executing individual instructions - any 
 
 For example, this script does the same as the script above for two resources:
 
-```JSON
+```json
 [
   [
     {
@@ -101,7 +101,7 @@ The result of this script evaluation is the array of two arrays containing two i
 
 JSONScript can include several instructions that will be executed in parallel:
 
-```JSON
+```json
 {
   "res1": {
     "$exec": "router",
@@ -126,7 +126,7 @@ Parallel evaluation is not limited to executing individual instructions - any sc
 
 For example, the script below is similar to the example in the previous section that updates two resources but it does it in parallel:
 
-```JSON
+```json
 {
   "res1": [
     {
@@ -168,7 +168,7 @@ Let's see what other instructions are defined in JSONScript core.
 
 During the evaluation the script can use the data instance passed to the interpeter in addition to the script:
 
-```JSON
+```json
 [
   {
     "$exec": "router",
@@ -185,7 +185,7 @@ During the evaluation the script can use the data instance passed to the interpe
 
 Data instance:
 
-```JSON
+```json
 {
   "path": "/resource/1",
   "body": { "test": "test" }
@@ -200,7 +200,7 @@ Not only some part of arguments can use scripts to evaluate it, any value in the
 
 For example, the executor name can be the result of the call to another executor:
 
-```JSON
+```json
 {
   "$exec": { "$exec": "chooseRouter" },
   "$method": "get",
@@ -215,7 +215,7 @@ The script can use results from any part of the script in another part of the sc
 
 The previous example where executor name was the result of another script evaluation could be re-written like this:
 
-```JSON
+```json
 {
   "router": { "$exec": "chooseRouter" },
   "response": {
@@ -248,7 +248,7 @@ JSONScript interpreters should both try to determine such situations as early as
 
 `$if` instruction can be used to choose the strict that will be evaluated based on some condition:
 
-```JSON
+```json
 {
   "$if": { "$exec": "checkAvailability", "$args": "router1" },
   "$then": {
@@ -274,7 +274,7 @@ Please note that the interpreter should NOT evaluate both scripts and choose the
 
 Scalar values can be used in any place where the script is expected - they evaluate to themselves. We can refactor the script above in this way:
 
-```JSON
+```json
 {
   "$exec": {
     "$if": { "$exec": "checkAvailability", "$args": "router1" },
@@ -288,7 +288,7 @@ Scalar values can be used in any place where the script is expected - they evalu
 
 or using reference:
 
-```JSON
+```json
 {
   "router": {
     "$if": { "$exec": "checkAvailability", "$args": "router1" },
@@ -310,7 +310,7 @@ or using reference:
 
 `$delay` instruction can be used to delay the start of evaluation of any script. That can be useful, for example, if you need to ensure that one script starts evaluating after another script starts, but you don't need for it to wait for the completion (as in sequential processing):
 
-```JSON
+```json
 {
   "res1": {
     "$exec": "router",
@@ -332,7 +332,7 @@ The evaluation result will be the same as without `$delay` istruction, but the s
 
 This instruction can also be used to create asynchronous value from synchronous value. For example if some executor expects an asynchronous value as an argument and you want to pass a constant, you can use `$delay`:
 
-```JSON
+```json
 {
   "$exec": "logger",
   "$method": "resolve",

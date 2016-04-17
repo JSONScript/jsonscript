@@ -58,3 +58,8 @@ See [Schema](https://github.com/JSONScript/jsonscript/blob/master/SCHEMA.md) for
 ## Implementation
 
 JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)
+
+
+## License
+
+[MIT](https://github.com/JSONScript/jsonscript/blob/master/LICENSE)

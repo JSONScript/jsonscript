@@ -1,6 +1,6 @@
 ---
 page_name: index
-title: JSONScript - Platform independent asynchronous scripting language using JSON format
+title: JSONScript - Asynchronous scripting language using JSON format
 layout: main
 ---
 # JSONScript
@@ -53,6 +53,11 @@ As the script executes, each instruction returns some data. By default this data
 ## Language
 
 See [Language](language.html)
+
+
+## Schema
+
+See [Schema](schema.html) for JSON-schemas for the script and for instruction definitions.
 
 
 ## Implementation

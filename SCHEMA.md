@@ -1,6 +1,6 @@
 # JSONScript Schema
 
-JSONScript uses JSON-Schema standard both for the validation schemas and for the schema that defines evauation process.
+JSONScript uses JSON-Schema standard both for the validation schemas and for the schema that defines evaluation process.
 
 [JSONScript schema](http://www.json-script.com/schema/schema.json#) the schema that does not validate scalar keywords in instructions (keyword values can be scripts and have to be validated when the script is evaluated).
 

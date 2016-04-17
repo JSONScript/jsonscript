@@ -339,25 +339,6 @@ Full-Width Styles
   text-shadow: #111 0px 0px 10px;
 }
 
-#downloads {
-  position: absolute;
-  z-index: 10;
-  bottom: 25px;
-  right: 10px;
-}
-
-#downloads a {
-  color: white;
-}
-
-.zip_download_link {
-  margin-left: 30px;
-}
-
-.tar_download_link {
-  margin-left: 10px;
-}
-
 #main_content_wrap {
   background: #f2f2f2;
   border-top: 1px solid #111;
@@ -408,10 +389,6 @@ Small Device Styles
 @media screen and (max-width: 480px) {
   body {
     font-size:14px;
-  }
-
-  #downloads {
-    display: none;
   }
 
   .inner {
@@ -465,6 +442,10 @@ Small Device Styles
 
   h6 {
     font-size: 12px;
+  }
+
+  h6 code {
+    font-size: 11px;
   }
 
   code, pre {

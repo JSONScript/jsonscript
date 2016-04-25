@@ -43,6 +43,13 @@
             "description": "queues items so that the next items is executed only after the previous asynchronous value receives data",
             "itemsSerial": { "$ref": "#" }
           }
+        },
+        {
+          "then": {
+            "title": "scalar values",
+            "description": "convert scalar values to asynchronouse values",
+            "valueToAsync": true
+          }
         }
       ]
     },

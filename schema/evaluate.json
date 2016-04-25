@@ -294,6 +294,13 @@
               "$ref": "#"
             }
           }
+        },
+        {
+          "then": {
+            "title": "scalar values",
+            "description": "convert scalar values to asynchronouse values",
+            "valueToAsync": true
+          }
         }
       ]
     },

@@ -19,6 +19,10 @@
     {
       "page": "schema",
       "linkText": "Schema"
+    },
+    {
+      "page": "implementations",
+      "linkText": "Implementations"
     }
   ],
   "pages": [
@@ -36,6 +40,11 @@
       "file": "SCHEMA.md",
       "page": "schema",
       "title": "JSONScript - Schema"
+    },
+    {
+      "file": "IMPLEMENTATIONS.md",
+      "page": "implementations",
+      "title": "JSONScript - Implementations"
     },
     {
       "file": "LICENSE",

@@ -262,6 +262,85 @@
                 }
               },
               {
+                "if": {
+                  "required": [
+                    "$func"
+                  ]
+                },
+                "then": {
+                  "title": "instruction $func",
+                  "allOf": [
+                    {
+                      "title": "evaluate properties",
+                      "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+                      "properties": {
+                        "$name": {
+                          "$ref": "#"
+                        },
+                        "$args": {
+                          "$ref": "#"
+                        }
+                      }
+                    },
+                    {
+                      "title": "object to [async] value",
+                      "description": "Merge object properties into a single [asynchronous] object value",
+                      "objectToAsync": true
+                    },
+                    {
+                      "title": "execute instruction",
+                      "description": "executes supported script instructions",
+                      "validateAsync": {
+                        "allOf": [
+                          {
+                            "description": "valdate evaluated instruction keywords",
+                            "properties": {
+                              "$name": {
+                                "type": "string",
+                                "anyOf": [
+                                  {
+                                    "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+                                  },
+                                  {
+                                    "format": "uuid"
+                                  }
+                                ]
+                              },
+                              "$args": {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+                                    },
+                                    {
+                                      "type": "object",
+                                      "minProperties": 1,
+                                      "maxProperties": 1,
+                                      "patternProperties": {
+                                        "^[A-Za-z_$][A-Za-z_$0-9]+$": {
+                                          "$ref": "http://json-schema.org/draft-04/schema#"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "description": "execute instruction using custom keyword",
+                            "eval$func": true
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
                 "then": {
                   "title": "parallel execution",
                   "allOf": [

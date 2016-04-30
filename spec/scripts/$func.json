@@ -1,0 +1,153 @@
+[
+  {
+    "description": "$func - function definition",
+    "schemas": [
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$func" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$func" }
+    ],
+    "tests": [
+      {
+        "description": "anonymous function, no arguments definition",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit",
+            "$args": [ { "$data": "/0" }, { "$data": "/1" } ]
+          }
+        },
+        "valid": true
+      },
+      {
+        "description": "anonymous function with named arguments",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit",
+            "$args": [ { "$data": "/x" }, { "$data": "/y" } ]
+          },
+          "$args": ["x", "y"]
+        },
+        "valid": true
+      },
+      {
+        "description": "named function with arguments with schemas",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit",
+            "$args": [ { "$data": "/x" }, { "$data": "/y" } ]
+          },
+          "$name": "doit",
+          "$args": [
+            { "x": { "type": "number" } },
+            { "y": { "type": "number" } }
+          ]
+        },
+        "valid": true
+      },
+      {
+        "description": "additional propertes are invalid",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "extra": true
+        },
+        "valid": false
+      },
+      {
+        "description": "valid if $args is a valid script",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$args": {
+            "$exec": "myfunc2",
+            "$args": [1, 2, 3]
+          }
+        },
+        "valid": true
+      },
+      {
+        "description": "invalid if $args is a invalid script",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$args": {
+            "$exec": "myfunc2",
+            "extra": {}
+          }
+        },
+        "valid": false
+      }
+    ]
+  },
+  {
+    "description": "$func syntax errors",
+    "schemas": [
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$func" }
+    ],
+    "tests": [
+      {
+        "description": "$name is scalar but not a string",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$name": 1
+        },
+        "valid": true
+      },
+      {
+        "description": "$name is invalid identifier",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$name": "foo%bar"
+        },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$func syntax errors with strict schema",
+    "schemas": [
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$func" }
+    ],
+    "tests": [
+      {
+        "description": "$name is scalar but not a string",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$name": 1
+        },
+        "valid": false
+      },
+      {
+        "description": "$name is invalid identifier",
+        "data": {
+          "$func": {
+            "$exec": "myobject",
+            "$method": "doit"
+          },
+          "$name": "foo%bar"
+        },
+        "valid": false
+      }
+    ]
+  }
+]

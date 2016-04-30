@@ -20,6 +20,9 @@
       "$ref": "#$delay"
     },
     {
+      "$ref": "#$func"
+    },
+    {
       "$ref": "#parallel"
     },
     {
@@ -119,6 +122,27 @@
       "additionalProperties": false,
       "required": [
         "$delay"
+      ]
+    },
+    "_$func": {
+      "id": "#$func",
+      "title": "$func",
+      "description": "function definition",
+      "type": "object",
+      "properties": {
+        "$func": {
+          "$ref": "#"
+        },
+        "$name": {
+          "$ref": "#"
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$func"
       ]
     },
     "parallel": {

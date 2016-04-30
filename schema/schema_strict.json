@@ -20,6 +20,9 @@
       "$ref": "#$delay"
     },
     {
+      "$ref": "#$func"
+    },
+    {
       "$ref": "#parallel"
     },
     {
@@ -240,6 +243,52 @@
       "additionalProperties": false,
       "required": [
         "$delay"
+      ]
+    },
+    "_$func": {
+      "id": "#$func",
+      "title": "$func",
+      "description": "function definition",
+      "type": "object",
+      "properties": {
+        "$func": {
+          "$ref": "#"
+        },
+        "$name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+                },
+                {
+                  "format": "uuid"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "type": [
+                    "object",
+                    "array"
+                  ]
+                },
+                {
+                  "$ref": "#"
+                }
+              ]
+            }
+          ]
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$func"
       ]
     },
     "parallel": {

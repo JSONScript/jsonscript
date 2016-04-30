@@ -1,0 +1,43 @@
+{
+  "name": "$func",
+  "description": "function definition",
+  "keywords": ["$func", "$name", "$args"],
+  "required": ["$func"],
+  "evaluate": {
+    "keywords": ["$name", "$args"],
+    "validatorKeyword": "eval$func",
+    "title": "function definition",
+    "description": "defines anonymous or named function"
+  },
+  "schema": {
+    "$name": {
+      "type": "string",
+      "anyOf": [
+        { "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$" },
+        { "format": "uuid" }
+      ]
+    },
+    "$args": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$"
+          },
+          {
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "patternProperties": {
+              "^[A-Za-z_$][A-Za-z_$0-9]+$": {
+                "$ref": "http://json-schema.org/draft-04/schema#"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@
   "keywords": ["$call", "$args"],
   "required": ["$call"],
   "evaluate": {
-    "validatorKeyword": "call$func",
+    "validatorKeyword": "eval$call",
     "title": "function call",
     "description": "calls function"
   },

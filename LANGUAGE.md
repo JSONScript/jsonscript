@@ -360,7 +360,7 @@ Anonymous or named function can be defined in the script to be passed to executo
       "$method": "get",
       "$args": { "path": { "$data": "/path" } }
     },
-    "$name": "getRes"
+    "$name": "getRes",
     "$args": [ "path" ]
   },
   {
@@ -407,4 +407,3 @@ Functions can be used as parameters in the executors:
 ```
 
 If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc".
-

@@ -20,6 +20,15 @@
       "$ref": "#$delay"
     },
     {
+      "$ref": "#$func"
+    },
+    {
+      "$ref": "#$call"
+    },
+    {
+      "$ref": "#$quote"
+    },
+    {
       "$ref": "#parallel"
     },
     {
@@ -119,6 +128,60 @@
       "additionalProperties": false,
       "required": [
         "$delay"
+      ]
+    },
+    "_$func": {
+      "id": "#$func",
+      "title": "$func",
+      "description": "function definition",
+      "type": "object",
+      "properties": {
+        "$func": {
+          "$ref": "#"
+        },
+        "$name": {
+          "$ref": "#"
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$func"
+      ]
+    },
+    "_$call": {
+      "id": "#$call",
+      "title": "$call",
+      "description": "function call",
+      "type": "object",
+      "properties": {
+        "$call": {
+          "$ref": "#"
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$call"
+      ]
+    },
+    "_$quote": {
+      "id": "#$quote",
+      "title": "$quote",
+      "description": "use value without evaluation",
+      "type": "object",
+      "properties": {
+        "$quote": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$quote"
       ]
     },
     "parallel": {

@@ -351,3 +351,65 @@ This instruction can also be used to create asynchronous value from synchronous 
 In the example above a hypothetical logger logs message when asynchronous value is resolved. `$delay` instruction result is an asynchrnous value that resolves 1 second after its evaluation with the value `"test"`.
 
 `$wait` keyword is optional, the default is 0. It means that the interpreter should schedule the script evaluation as soon as possible but do not execute it immediately.
+
+
+## Defining and calling functions with `$func` and `$call`
+
+Anonymous or named function can be defined in the script to be passed to executors (either predefined or supplied by user) or simply to be used multiple times.
+
+```json
+[
+  {
+    "$func": {
+      "$exec": "router",
+      "$method": "get",
+      "$args": { "path": { "$data": "/path" } }
+    },
+    "$name": "getRes"
+    "$args": [ "path" ]
+  },
+  {
+    "$call": "getRes",
+    "$args": [ "/resource/1" ]
+  },
+  {
+    "$call": { "$ref": "/0" },
+    "$args": { "path": "/resource/2" }
+  },
+  {
+    "$call": { "$ref": "1/0" },
+    "$args": "/resource/3"
+  }
+]
+```
+
+In the example above the same function `getRes` is used three times, being called by name and using $ref with absolute and relative JSON-pointers. Arguments can be passed to function as array, as an object (property names should match parameters declarations, otherwise an exception will be thrown) and as a scalar value if there is only one parameter.
+
+Functions can be used as parameters in the executors:
+
+```json
+{
+  "$exec": "array",
+  "$method": "map",
+  "$args": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$exec": "router1",
+        "$method": "get",
+        "$args": {
+          "path": { "$data": "/path" }
+        }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
+If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc".
+

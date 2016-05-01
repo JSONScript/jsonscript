@@ -6,5 +6,6 @@ module.exports = [
   require('./$data.json'),
   require('./$if.json'),
   require('./$delay.json'),
-  require('./$func.json')
+  require('./$func.json'),
+  require('./$call.json')
 ];

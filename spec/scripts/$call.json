@@ -1,0 +1,99 @@
+[
+  {
+    "description": "$call - function call",
+    "schemas": [
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$call" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$call" }
+    ],
+    "tests": [
+      {
+        "description": "call named function, no arguments",
+        "data": {
+          "$call": "myfunc"
+        },
+        "valid": true
+      },
+      {
+        "description": "call named function, args is array",
+        "data": {
+          "$call": "myfunc",
+          "$args": [ 1, 2 ]
+        },
+        "valid": true
+      },
+      {
+        "description": "call named function, args is object",
+        "data": {
+          "$call": "myfunc",
+          "$args": { "x": 1, "y": 2 }
+        },
+        "valid": true
+      },
+      {
+        "description": "call named function, args is scalar",
+        "data": {
+          "$call": "myfunc",
+          "$args": "foo"
+        },
+        "valid": true
+      },
+      {
+        "description": "call inline anonymous function",
+        "data": {
+          "$call": {
+            "$func": {
+              "$exec": "calc",
+              "$method": "add",
+              "$args": [
+                { "$data": "/x" },
+                { "$data": "/y" }
+              ]
+            },
+            "$args": [ "x", "y" ]
+          },
+          "$args": { "x": 1, "y": 2 }
+        },
+        "valid": true
+      },
+      {
+        "description": "call function by reference",
+        "data": {
+          "$call": { "$ref": "/defs/myfunc" },
+          "$args": { "x": 1, "y": 2 }
+        },
+        "valid": true
+      }
+    ]
+  },
+  {
+    "description": "$call syntax errors",
+    "schemas": [
+      { "$ref": "http://www.json-script.com/schema/schema.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema.json#$call" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
+      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$call" }
+    ],
+    "tests": [
+      {
+        "description": "$call is scalar but not a string (passes validation, fails at eval time)",
+        "data": { "$call": 1 },
+        "valid": true
+      },
+      {
+        "description": "$call is invalid string (passes validation, fails at eval time)",
+        "data": { "$call": "foo%bar" },
+        "valid": true
+      },
+      {
+        "description": "additional properties",
+        "data": {
+          "$call": "myfunc",
+          "extras": {}
+        },
+        "valid": false
+      }
+    ]
+  }
+]

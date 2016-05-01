@@ -1,0 +1,28 @@
+{
+  "name": "$call",
+  "description": "function call",
+  "keywords": ["$call", "$args"],
+  "required": ["$call"],
+  "evaluate": {
+    "validatorKeyword": "call$func",
+    "title": "function call",
+    "description": "calls function"
+  },
+  "schema": {
+    "$call": {
+      "anyOf": [
+        {
+          "type": "string",
+          "anyOf": [
+            { "pattern": "^[A-Za-z_$][A-Za-z_$0-9]+$" },
+            { "format": "uuid" }
+          ]
+        },
+        {
+          "description": "custom keyword to validate that value is a function",
+          "function": true
+        }
+      ]
+    }
+  }
+}

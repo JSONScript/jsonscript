@@ -23,6 +23,9 @@
       "$ref": "#$func"
     },
     {
+      "$ref": "#$call"
+    },
+    {
       "$ref": "#parallel"
     },
     {
@@ -143,6 +146,24 @@
       "additionalProperties": false,
       "required": [
         "$func"
+      ]
+    },
+    "_$call": {
+      "id": "#$call",
+      "title": "$call",
+      "description": "function call",
+      "type": "object",
+      "properties": {
+        "$call": {
+          "$ref": "#"
+        },
+        "$args": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$call"
       ]
     },
     "parallel": {

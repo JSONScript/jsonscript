@@ -1,6 +1,6 @@
 {
   "name": "jsonscript",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Platform independent asynchronous and concurrent scripting language using JSON format",
   "main": "index.js",
   "scripts": {

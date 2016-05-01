@@ -39,7 +39,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$exec": {
                                 "type": "string",
@@ -95,7 +95,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$ref": {
                                 "type": "string",
@@ -147,7 +147,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$data": {
                                 "type": "string",
@@ -194,7 +194,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$if": {
                                 "type": "boolean"
@@ -243,7 +243,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$wait": {
                                 "type": "integer",
@@ -293,7 +293,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$name": {
                                 "type": "string",
@@ -367,7 +367,7 @@
                       "validateAsync": {
                         "allOf": [
                           {
-                            "description": "valdate evaluated instruction keywords",
+                            "description": "validate evaluated instruction keywords",
                             "properties": {
                               "$call": {
                                 "anyOf": [
@@ -395,6 +395,26 @@
                             "call$func": true
                           }
                         ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "required": [
+                    "$quote"
+                  ]
+                },
+                "then": {
+                  "title": "instruction $quote",
+                  "allOf": [
+                    {
+                      "title": "execute instruction",
+                      "description": "executes supported script instructions",
+                      "validateAsync": {
+                        "description": "execute instruction using custom keyword",
+                        "eval$quote": true
                       }
                     }
                   ]

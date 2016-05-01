@@ -34,8 +34,9 @@
       "properties": {
         "keywords": {
           "description": "keywords that should be evaluated before validator keyword is called. If this property is absent, all keywords will be evaluated (in parallel)",
-          "allOf": [
-            { "$ref": "#keywordsArray" }
+          "anyOf": [
+            { "$ref": "#keywordsArray" },
+            { "$ref": "#emptyArray" }
           ]
         },
         "validatorKeyword": {
@@ -74,6 +75,11 @@
       "items": { "$ref": "#scriptKeyword" },
       "minItems": 1,
       "uniqueItems": true
+    },
+    "emptyArray": {
+      "id": "#emptyArray",
+      "type": "array",
+      "maxItems": 0
     }
   }
 }

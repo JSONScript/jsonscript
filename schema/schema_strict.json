@@ -26,6 +26,9 @@
       "$ref": "#$call"
     },
     {
+      "$ref": "#$quote"
+    },
+    {
       "$ref": "#parallel"
     },
     {
@@ -310,6 +313,21 @@
       "additionalProperties": false,
       "required": [
         "$call"
+      ]
+    },
+    "_$quote": {
+      "id": "#$quote",
+      "title": "$quote",
+      "description": "use value without evaluation",
+      "type": "object",
+      "properties": {
+        "$quote": {
+          "$ref": "#"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "$quote"
       ]
     },
     "parallel": {

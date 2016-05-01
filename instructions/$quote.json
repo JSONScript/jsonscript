@@ -1,0 +1,12 @@
+{
+  "name": "$quote",
+  "description": "use value without evaluation",
+  "keywords": ["$quote"],
+  "required": ["$quote"],
+  "evaluate": {
+    "keywords": [],
+    "validatorKeyword": "eval$quote",
+    "title": "use value",
+    "description": "use value without evaluation"
+  }
+}

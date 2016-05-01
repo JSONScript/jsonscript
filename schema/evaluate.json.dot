@@ -65,25 +65,28 @@
   {
     "title": "instruction {{=inst.name}}",
     "allOf": [
-      {
-        "title": "evaluate properties",
-        "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
-        {{? inst.evaluate.keywords }}
-          "properties": {
-            {{~ inst.evaluate.keywords:keyword:i }}
-              {{?i}},{{?}}
-              "{{=keyword}}": { "$ref": "#" }
-            {{~}}
-          }
-        {{??}}
-          "additionalProperties": { "$ref": "#" }
-        {{?}}
-      },
-      {
-        "title": "object to [async] value",
-        "description": "Merge object properties into a single [asynchronous] object value",
-        "objectToAsync": true
-      },
+      {{ var evalKeywords = inst.evaluate.keywords; }}
+      {{? !evalKeywords || evalKeywords.length }}
+        {
+          "title": "evaluate properties",
+          "description": "evaluates all or some keywords using this (full) schema, properties-scripts are replaced with returned synchronous or asynchronous value",
+          {{? evalKeywords }}
+            "properties": {
+              {{~ evalKeywords:keyword:i }}
+                {{?i}},{{?}}
+                "{{=keyword}}": { "$ref": "#" }
+              {{~}}
+            }
+          {{??}}
+            "additionalProperties": { "$ref": "#" }
+          {{?}}
+        },
+        {
+          "title": "object to [async] value",
+          "description": "Merge object properties into a single [asynchronous] object value",
+          "objectToAsync": true
+        },
+      {{?}}
       {
         "title": "execute instruction",
         "description": "executes supported script instructions",
@@ -91,7 +94,7 @@
           {{? inst.schema }}
             "allOf": [
               {
-                "description": "valdate evaluated instruction keywords",
+                "description": "validate evaluated instruction keywords",
                 "properties": {{= JSON.stringify(inst.schema) }}
               },
               {

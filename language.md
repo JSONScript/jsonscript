@@ -411,4 +411,29 @@ Functions can be used as parameters in the executors:
 }
 ```
 
-If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc".
+If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc", to define the function that always returns the same string you can use "$quote".
+
+
+## Using any value without evaluation with `$quote`
+
+To insert an object that contains properties that start with `"$"` that normally should only be used in instructions you can use `$quote` instruction: For example, this script:
+
+```json
+{
+  "$quote": {
+    "$exec": "myExec"
+  }
+}
+```
+
+evaluates as: `{ "$exec": "myExec" }`.
+
+`$quote` can also be used to define the function that always returns the same string:
+
+```json
+{
+  "$func": { "$quote": "foo" }
+}
+```
+
+The anonymous function defined above always returns the string `"foo"`. Without `$quote` it would be the reference to the function with the name `foo`.

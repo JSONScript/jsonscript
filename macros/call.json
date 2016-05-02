@@ -1,0 +1,16 @@
+{
+  "name": "call",
+  "description": "function call",
+  "rules": [
+    {
+      "description": "call named function with arguments",
+      "rule": {
+        "^\\$\\#(.+)$": 1
+      },
+      "script": {
+        "$call": "$1",
+        "$args": 1
+      }
+    }
+  ]
+}

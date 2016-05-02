@@ -1,25 +1,25 @@
 {
   "name": "exec",
-  "description": "executor call",
+  "description": "short syntax for executor call",
   "rules": [
     {
-      "description": "executor call without method",
-      "rule": {
-        "^\\$\\$([^\\.]+)$": 1
-      },
-      "script": {
-        "$exec": "$1",
-        "$args": 1
-      }
-    },
-    {
       "description": "executor call with method",
-      "rule": {
+      "pattern": {
         "^\\$\\$([^\\.]+)\\.([^\\.]+)$": 1
       },
       "script": {
         "$exec": "$1",
         "$method": "$2",
+        "$args": 1
+      }
+    },
+    {
+      "description": "executor call without method",
+      "pattern": {
+        "^\\$\\$([^\\.]+)$": 1
+      },
+      "script": {
+        "$exec": "$1",
         "$args": 1
       }
     }

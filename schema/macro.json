@@ -19,11 +19,11 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": [ "description", "rule", "script" ],
+        "required": [ "description", "pattern", "script" ],
         "additionalProperties": false,
         "properties": {
           "description": { "$ref": "#nonEmptyString" },
-          "rule": {
+          "pattern": {
             "type": "object",
             "minProperties": 1,
             "maxProperties": 1,

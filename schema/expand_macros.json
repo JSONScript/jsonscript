@@ -12,20 +12,8 @@
         "anyOf": [
           {
             "expandJsMacro": {
-              "description": "executor call without method",
-              "rule": {
-                "^\\$\\$([^\\.]+)$": 1
-              },
-              "script": {
-                "$exec": "$1",
-                "$args": 1
-              }
-            }
-          },
-          {
-            "expandJsMacro": {
               "description": "executor call with method",
-              "rule": {
+              "pattern": {
                 "^\\$\\$([^\\.]+)\\.([^\\.]+)$": 1
               },
               "script": {
@@ -37,8 +25,20 @@
           },
           {
             "expandJsMacro": {
+              "description": "executor call without method",
+              "pattern": {
+                "^\\$\\$([^\\.]+)$": 1
+              },
+              "script": {
+                "$exec": "$1",
+                "$args": 1
+              }
+            }
+          },
+          {
+            "expandJsMacro": {
               "description": "call named function with arguments",
-              "rule": {
+              "pattern": {
                 "^\\$\\#(.+)$": 1
               },
               "script": {

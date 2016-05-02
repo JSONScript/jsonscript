@@ -1,10 +1,10 @@
 {
   "name": "call",
-  "description": "function call",
+  "description": "short syntax for function call",
   "rules": [
     {
       "description": "call named function with arguments",
-      "rule": {
+      "pattern": {
         "^\\$\\#(.+)$": 1
       },
       "script": {

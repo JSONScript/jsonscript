@@ -23,6 +23,14 @@ In the example above it is an object with the name `"router"` (the value of the 
 
 When this simple script is evaluated its value will be the resolved value that the executor returns. See [Synchronous and asynchronous values](#synchronous-and-asynchronous-values).
 
+The full syntax above allows all properties to be evaluated - executor name and methods can be the result of some other scripts. For the majority of cases when these are constants the short syntax can be used:
+
+```json
+{ "$$router.get": { "path": "/resource/1" } }
+```
+
+This is achieved via [macros](#macros) support.
+
 JSONScript core includes other instructions that will be shown later and the interpreter may allow to define your own custom instructions.
 
 With JSONScript you can combine instructions in three ways:
@@ -55,8 +63,17 @@ JSONScript can include several instructions that will be executed sequentially:
   {
     "$exec": "router",
     "$method": "put",
-    "$args": { "path": "/resource/1", "body": { "test": "test" } }
+    "$args": { "path": "/resource/1", "body": "test" }
   }
+]
+```
+
+or with short syntax:
+
+```json
+[
+  { "$$router.get": { "path": "/resource/1" } },
+  { "$$router.put": { "path": "/resource/1", "body": "test" } }
 ]
 ```
 
@@ -81,7 +98,7 @@ For example, this script does the same as the script above for two resources:
     {
       "$exec": "router",
       "$method": "put",
-      "$args": { "path": "/resource/1", "body": { "test": "test" } }
+      "$args": { "path": "/resource/1", "body": "test" }
     }
   ],
   [
@@ -93,11 +110,27 @@ For example, this script does the same as the script above for two resources:
     {
       "$exec": "router",
       "$method": "put",
-      "$args": { "path": "/resource/2", "body": { "test": "test" } }
+      "$args": { "path": "/resource/2", "body": "test" }
     }
   ]
 ]
 ```
+
+or with short syntax:
+
+```json
+[
+  [
+    { "$$router.get": { "path": "/resource/1" } },
+    { "$$router.put": { "path": "/resource/1", "body": "test" } }
+  ],
+  [
+    { "$$router.get": { "path": "/resource/2" } },
+    { "$$router.put": { "path": "/resource/2", "body": "test" } }
+  ]
+]
+```
+
 
 The result of this script evaluation is the array of two arrays containing two items each, the items being the results of evaluation of individual instructions.
 
@@ -118,6 +151,15 @@ JSONScript can include several instructions that will be executed in parallel:
     "$method": "get",
     "$args": { "path": "/resource/2" }
   }
+}
+```
+
+or with short syntax:
+
+```json
+{
+  "res1": { "$$router.get": { "path": "/resource/1" } },
+  "res2": { "$$router.get": { "path": "/resource/2" } }
 }
 ```
 
@@ -142,7 +184,7 @@ For example, the script below is similar to the example in the previous section 
     {
       "$exec": "router",
       "$method": "put",
-      "$args": { "path": "/resource/1", "body": { "test": "test" } }
+      "$args": { "path": "/resource/1", "body": "test" }
     }
   ],
   "res2": [
@@ -154,8 +196,23 @@ For example, the script below is similar to the example in the previous section 
     {
       "$exec": "router",
       "$method": "put",
-      "$args": { "path": "/resource/2", "body": { "test": "test" } }
+      "$args": { "path": "/resource/2", "body": "test" }
     }
+  ]
+}
+```
+
+or with short syntax:
+
+```json
+{
+  "res1": [
+    { "$$router.get": { "path": "/resource/1" } },
+    { "$$router.put": { "path": "/resource/1", "body": "test" } }
+  ],
+  "res2": [
+    { "$$router.get": { "path": "/resource/2" } },
+    { "$$router.put": { "path": "/resource/2", "body": "test" } }
   ]
 }
 ```
@@ -185,6 +242,15 @@ During the evaluation the script can use the data instance passed to the interpe
     "$method": "put",
     "$args": { "$data": "" }
   }
+]
+```
+
+or with short syntax:
+
+```json
+[
+  { "$$router.get: { "path": { "$data": "/path" } } },
+  { "$$router.put": { "$data": "" } }
 ]
 ```
 
@@ -269,6 +335,16 @@ JSONScript interpreters should both try to determine such situations as early as
 }
 ```
 
+or with short syntax:
+
+```json
+{
+  "$if": { "$$checkAvailability": "router1" },
+  "$then": { "$$router1.get": { "path": "/resource/1" } },
+  "$else": { "$$router2.get": { "path": "/resource/1" } }
+}
+```
+
 The result of the evaluation of the script in `$if` keyword should be a boolean value, otherwise the whole script will fail to evailuate (no type coercion is made).
 
 If the condition is `true` then the script in `$then` keyword will be evaluted and its result will be the result of `$if` instruction, otherwise the script in `$else` will be evaluated and `$if` evaluate to its result.
@@ -333,6 +409,18 @@ or using reference:
 }
 ```
 
+or with short syntax:
+
+```json
+{
+  "res1": { "$$router.get": { "path": "/resource/1" } },
+  "res2": {
+    "$delay": { "$$router.get": { "path": "/resource/2" } },
+    "$wait": 50
+  }
+}
+```
+
 The evaluation result will be the same as without `$delay` istruction, but the second "$exec" instruction will start executing at least 50 milliseconds later than the first.
 
 This instruction can also be used to create asynchronous value from synchronous value. For example if some executor expects an asynchronous value as an argument and you want to pass a constant, you can use `$delay`:
@@ -342,6 +430,17 @@ This instruction can also be used to create asynchronous value from synchronous 
   "$exec": "logger",
   "$method": "resolve",
   "$args": {
+    "message": "Resolved",
+    "asyncValue": { "$delay": "test", "$wait": 1000 }
+  }
+}
+```
+
+or with short syntax:
+
+```json
+{
+  "$$logger.resolve": {
     "message": "Resolved",
     "asyncValue": { "$delay": "test", "$wait": 1000 }
   }
@@ -383,6 +482,27 @@ Anonymous or named function can be defined in the script to be passed to executo
 ]
 ```
 
+or with short syntax:
+
+```json
+[
+  {
+    "$func": { "$$router.get" { "path": { "$data": "/path" } } },
+    "$name": "getRes",
+    "$args": [ "path" ]
+  },
+  { "$#getRes": [ "/resource/1" ] },
+  {
+    "$call": { "$ref": "/0" },
+    "$args": { "path": "/resource/2" }
+  },
+  {
+    "$call": { "$ref": "1/0" },
+    "$args": "/resource/3"
+  }
+]
+```
+
 In the example above the same function `getRes` is used three times, being called by name and using $ref with absolute and relative JSON-pointers. Arguments can be passed to function as array, as an object (property names should match parameters declarations, otherwise an exception will be thrown) and as a scalar value if there is only one parameter.
 
 Functions can be used as parameters in the executors:
@@ -411,6 +531,26 @@ Functions can be used as parameters in the executors:
 }
 ```
 
+or with short syntax:
+
+```json
+{
+  "$$array.map": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$$router1.get": { "path": { "$data": "/path" } }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
 If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc", to define the function that always returns the same string you can use "$quote".
 
 
@@ -426,7 +566,7 @@ To insert an object that contains properties that start with `"$"` that normally
 }
 ```
 
-evaluates as: `{ "$exec": "myExec" }`.
+evaluates as: `{ "$exec": "myExec" }` and the executor is not called.
 
 `$quote` can also be used to define the function that always returns the same string:
 
@@ -436,4 +576,141 @@ evaluates as: `{ "$exec": "myExec" }`.
 }
 ```
 
-The anonymous function defined above always returns the string `"foo"`. Without `$quote` it would be the reference to the function with the name `foo`.
+The anonymous function defined above always returns the string `"foo"`. Without `$quote` it would have been the reference to the function with the name `foo`.
+
+
+## Calculations
+
+Predefined executor `calc` defines methods for arythmetic, comparison and logical operations. For all operations the arguments (`$args`) should be an array and operations are applied to the list:
+
+```json
+{ "$+": [ 1, 2, 3 ] }
+```
+
+or using the full syntax:
+
+```json
+{
+  "$exec": "calc",
+  "$method": "add",
+  "$args": [ 1, 2, 3 ]
+}
+```
+
+Full syntax can be useful if you need to determine the required operation using some script:
+
+```json
+{
+  "$exec": "calc",
+  "$method": { "$data": "/method" },
+  "$args": [ 1, 2, 3 ]
+}
+```
+
+For arythmetic and comparison operations arguments must be numbers, there is no type coercion.
+
+For boolean operations arguments must be boolean values.
+
+Equality operations can work with any type.
+
+
+Defined operations:
+
+| method|short syntax|evaluation|
+|--------------|:---:|---|
+| add          |"$+" |add all arguments|
+| subtract     |"$-" |subtract arguments from the first argument|
+| multiply     |"$*" |multiply all arguments|
+| divide       |"$/" |divide the first argument by the rest|
+| equal        |"$=="|true if all arguments are equal|
+| notEqual     |"$!="|true if at least one argument is different|
+| greater      |"$>" |true if arguments are descending|
+| greaterEqual |"$>="|true if arguments are not ascending|
+| lesser       |"$<" |true if arguments are ascending|
+| lesserEqual  |"$<="|true if arguments are not descending|
+| and          |"$&&"|true if all arguments are true|
+| or           |"$||"|true if one or more arguments are true and the rest are false|
+| xor          |"$^^"|true if exactly one argument is true and others are false|
+| not          |"$!" |negates boolean value|
+
+
+## Array iteration
+
+Predefined executor `array` implements methods for array iteration:
+
+```json
+{
+  "$$array.map": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$$router.get": { "path": { "$data": "/path" } }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
+The example above calls the method `get` of executor `router` for all paths. The result of evaluation of this script will be the array of responses.
+
+Same script using full syntax:
+
+```json
+{
+  "$exec": "array",
+  "$method": "map",
+  "$args": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$exec": "router",
+        "$method": "get",
+        "$args": { "path": { "$data": "/path" } }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
+Defined array methods:
+
+| method |evaluation result|
+|--------|---|
+| map    |new array with function call results for each item|
+| filter |new array of original items for which function calls return `true`|
+| every  |`true` if all function calls return `true`|
+| some   |`true` if at least one function call returns `true`|
+
+
+This script filters only positive numbers from array:
+
+```
+{
+  "$$array.filter": {
+    "data": [ -2, -1, 0, 1, 2, 3 ],
+    "iterator": {
+      "$func": {
+        "$>": [ { "$data": "/num" }, 0 ]
+      },
+      "$args": ["num"]
+    }
+  }
+}
+```
+
+For all methods iterator function is called with 3 parameters: array item, item index and the array itself.
+
+
+## Macros
+
+JSONScript defines several core macros to support short syntax for calculations and for calling executors methods and functions. The interpreter may allow to define your own custom macros.

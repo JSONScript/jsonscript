@@ -3,6 +3,7 @@
 var macros = require('../macros');
 var Ajv = require('ajv');
 var ajv = Ajv({ v5: true });
+ajv.addSchema(require('../schema/schema.json'));
 var validate = ajv.compile(require('../schema/macro.json'));
 var assert = require('assert');
 

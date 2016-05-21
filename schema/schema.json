@@ -1,6 +1,6 @@
 {
   "id": "http://www.json-script.com/schema/schema.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",
   "anyOf": [
@@ -27,6 +27,18 @@
     },
     {
       "$ref": "#$quote"
+    },
+    {
+      "$ref": "#macro_exec_0"
+    },
+    {
+      "$ref": "#macro_exec_1"
+    },
+    {
+      "$ref": "#macro_call_0"
+    },
+    {
+      "$ref": "#macro_calc_0"
     },
     {
       "$ref": "#parallel"
@@ -182,6 +194,70 @@
       "additionalProperties": false,
       "required": [
         "$quote"
+      ]
+    },
+    "_macro_exec_0": {
+      "id": "#macro_exec_0",
+      "description": "short syntax for executor call",
+      "type": "object",
+      "patternProperties": {
+        "^\\$\\$([^\\.]+)\\.([^\\.]+)$": {
+          "$ref": "#"
+        }
+      },
+      "maxProperties": 1,
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternRequired": [
+        "^\\$\\$([^\\.]+)\\.([^\\.]+)$"
+      ]
+    },
+    "_macro_exec_1": {
+      "id": "#macro_exec_1",
+      "description": "short syntax for executor call",
+      "type": "object",
+      "patternProperties": {
+        "^\\$\\$([^\\.]+)$": {
+          "$ref": "#"
+        }
+      },
+      "maxProperties": 1,
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternRequired": [
+        "^\\$\\$([^\\.]+)$"
+      ]
+    },
+    "_macro_call_0": {
+      "id": "#macro_call_0",
+      "description": "short syntax for function call",
+      "type": "object",
+      "patternProperties": {
+        "^\\$\\#(.+)$": {
+          "$ref": "#"
+        }
+      },
+      "maxProperties": 1,
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternRequired": [
+        "^\\$\\#(.+)$"
+      ]
+    },
+    "_macro_calc_0": {
+      "id": "#macro_calc_0",
+      "description": "short calculations syntax",
+      "type": "object",
+      "patternProperties": {
+        "\\$([+\\-*/=!<>&\\|^]{1,2})": {
+          "$ref": "#"
+        }
+      },
+      "maxProperties": 1,
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternRequired": [
+        "\\$([+\\-*/=!<>&\\|^]{1,2})"
       ]
     },
     "parallel": {

@@ -44,8 +44,26 @@
                     "pattern": "^\\$[1-9]$"
                   },
                   {
+                    "description": "object with a single property that refers to the match; the value of the property is a substitution map",
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 1,
+                    "additionalProperties": false,
+                    "patternProperties": {
+                      "^\\$[1-9]$": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  {
                     "description": "this number referes to the value in the macro",
                     "type": "integer"
+                  },
+                  {
+                    "description": "any valid JSONScript"
                   }
                 ]
               }

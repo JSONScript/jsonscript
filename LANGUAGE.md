@@ -574,6 +574,138 @@ evaluates as: `{ "$exec": "myExec" }` and the executor is not called.
 The anonymous function defined above always returns the string `"foo"`. Without `$quote` it would have been the reference to the function with the name `foo`.
 
 
+## Calculations
+
+Predefined executor `calc` defines methods for arythmetic, comparison and logical operations. For all operations the arguments (`$args`) should be an array and operations are applied to the list:
+
+```json
+{ "$+": [ 1, 2, 3 ] }
+```
+
+or using the full syntax:
+
+```json
+{
+  "$exec": "calc",
+  "$method": "add",
+  "$args": [ 1, 2, 3 ]
+}
+```
+
+Full syntax can be useful if you need to determine the required operation using some script:
+
+```json
+{
+  "$exec": "calc",
+  "$method": { "$data": "/method" },
+  "$args": [ 1, 2, 3 ]
+}
+```
+
+For arythmetic and comparison operations arguments must be numbers, there is no type coercion.
+
+For boolean operations arguments must be boolean values.
+
+Equality operations can work with any type.
+
+
+Defined operations:
+
+| method|short syntax|evaluation|
+|--------------|:---:|---|
+| add          |"$+" |add all arguments|
+| subtract     |"$-" |subtract arguments from the first argument|
+| multiply     |"$*" |multiply all arguments|
+| divide       |"$/" |divide the first argument by the rest|
+| equal        |"$=="|true if all arguments are equal|
+| notEqual     |"$!="|true if at least one argument is different|
+| greater      |"$>" |true if arguments are descending|
+| greaterEqual |"$>="|true if arguments are not ascending|
+| lesser       |"$<" |true if arguments are ascending|
+| lesserEqual  |"$<="|true if arguments are not descending|
+| and          |"$&&"|true if all arguments are true|
+| or           |"$||"|true if one or more arguments are true and the rest are false|
+| xor          |"$^^"|true if exactly one argument is true and others are false|
+| not          |"$!" |negates boolean value|
+
+
+## Array iteration
+
+Predefined executor `array` implements methods for array iteration:
+
+```json
+{
+  "$$array.map": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$$router.get": { "path": { "$data": "/path" } }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
+The example above calls the method `get` of executor `router` for all paths. The result of evaluation of this script will be the array of responses.
+
+Same script using full syntax:
+
+```json
+{
+  "$exec": "array",
+  "$method": "map",
+  "$args": {
+    "data": [
+      "/resource/1",
+      "/resource/2",
+      "/resource/3"
+    ],
+    "iterator": {
+      "$func": {
+        "$exec": "router",
+        "$method": "get",
+        "$args": { "path": { "$data": "/path" } }
+      },
+      "$args": ["path"]
+    }
+  }
+}
+```
+
+Defined array methods:
+
+| method |evaluation result|
+|--------|---|
+| map    |new array with function call results for each item|
+| filter |new array of original items for which function calls return `true`|
+| every  |`true` if all function calls return `true`|
+| some   |`true` if at least one function call returns `true`|
+
+
+This script filters only positive numbers from array:
+
+```
+{
+  "$$array.filter": {
+    "data": [ -2, -1, 0, 1, 2, 3 ],
+    "iterator": {
+      "$func": {
+        "$>": [ { "$data": "/num" }, 0 ]
+      },
+      "$args": ["num"]
+    }
+  }
+}
+```
+
+For all methods iterator function is called with 3 parameters: array item, item index and the array itself.
+
+
 ## Macros
 
-JSONScript defines several core macros to support short syntax for executor and function calls and for calculations. The interpreter may allow to define your own custom macros.
+JSONScript defines several core macros to support short syntax for calculations and for calling executors methods and functions. The interpreter may allow to define your own custom macros.

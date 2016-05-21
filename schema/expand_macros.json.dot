@@ -3,22 +3,28 @@
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "title": "JSONScript macro expansion schema",
   "description": "Schema with custom keywords that expands macros in JSON script.",
-  "switch": [{
-    "if": { "type": "object" },
-    "then": {
-      "anyOf": [
-        {{~ it.macros:macro }}
-          {{~ macro.rules:rule }}
-            {
-              "expandJsMacro": {{= JSON.stringify(rule) }}
-            },
-          {{~}}
-        {{~}}
-        {
-          "additionalProperties": { "$ref": "#" }
-        }
-      ]
+  "switch": [
+    {
+      "if": { "type": "object" },
+      "then": {
+        "allOf": [
+          {
+            "anyOf": [
+              {{~ it.macros:macro }}
+                {{~ macro.rules:rule }}
+                  { "expandJsMacro": {{= JSON.stringify(rule) }} },
+                {{~}}
+              {{~}}
+              { "additionalProperties": { "$ref": "#" } }
+            ]
+          },
+          { "additionalProperties": { "$ref": "#" } }
+        ]
+      }
+    },
+    {
+      "if": { "type": "array" },
+      "then": { "items": { "$ref": "#" } }
     }
-  }],
-  "items": { "$ref": "#" }
+  ]
 }

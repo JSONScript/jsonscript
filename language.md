@@ -249,7 +249,7 @@ or with short syntax:
 
 ```json
 [
-  { "$$router.get: { "path": { "$data": "/path" } } },
+  { "$$router.get": { "path": { "$data": "/path" } } },
   { "$$router.put": { "$data": "" } }
 ]
 ```
@@ -487,7 +487,7 @@ or with short syntax:
 ```json
 [
   {
-    "$func": { "$$router.get" { "path": { "$data": "/path" } } },
+    "$func": { "$$router.get": { "path": { "$data": "/path" } } },
     "$name": "getRes",
     "$args": [ "path" ]
   },
@@ -629,7 +629,7 @@ Defined operations:
 | lesser       |"$<" |true if arguments are ascending|
 | lesserEqual  |"$<="|true if arguments are not descending|
 | and          |"$&&"|true if all arguments are true|
-| or           |"$||"|true if one or more arguments are true and the rest are false|
+| or           |"$\|\|"|true if one or more arguments are true and the rest are false|
 | xor          |"$^^"|true if exactly one argument is true and others are false|
 | not          |"$!" |negates boolean value|
 

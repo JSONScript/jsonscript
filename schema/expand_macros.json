@@ -1,0 +1,108 @@
+{
+  "id": "http://www.json-script.com/schema/expand_macros.json#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
+  "title": "JSONScript macro expansion schema",
+  "description": "Schema with custom keywords that expands macros in JSON script.",
+  "switch": [
+    {
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "allOf": [
+          {
+            "anyOf": [
+              {
+                "expandJsMacro": {
+                  "description": "executor call with method",
+                  "pattern": {
+                    "^\\$\\$([^\\.]+)\\.([^\\.]+)$": 1
+                  },
+                  "script": {
+                    "$exec": "$1",
+                    "$method": "$2",
+                    "$args": 1
+                  }
+                }
+              },
+              {
+                "expandJsMacro": {
+                  "description": "executor call without method",
+                  "pattern": {
+                    "^\\$\\$([^\\.]+)$": 1
+                  },
+                  "script": {
+                    "$exec": "$1",
+                    "$args": 1
+                  }
+                }
+              },
+              {
+                "expandJsMacro": {
+                  "description": "call named function with arguments",
+                  "pattern": {
+                    "^\\$\\#(.+)$": 1
+                  },
+                  "script": {
+                    "$call": "$1",
+                    "$args": 1
+                  }
+                }
+              },
+              {
+                "expandJsMacro": {
+                  "description": "calculation",
+                  "pattern": {
+                    "\\$([+\\-*/=!<>&\\|^]{1,2})": 1
+                  },
+                  "script": {
+                    "$exec": "calc",
+                    "$method": {
+                      "$1": {
+                        "+": "add",
+                        "-": "subtract",
+                        "*": "multiply",
+                        "/": "divide",
+                        "==": "equal",
+                        "!=": "notEqual",
+                        ">": "greater",
+                        ">=": "greaterEqual",
+                        "<": "lesser",
+                        "<=": "lesserEqual",
+                        "&&": "and",
+                        "||": "or",
+                        "^^": "xor",
+                        "!": "not"
+                      }
+                    },
+                    "$args": 1
+                  }
+                }
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#"
+                }
+              }
+            ]
+          },
+          {
+            "additionalProperties": {
+              "$ref": "#"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "type": "array"
+      },
+      "then": {
+        "items": {
+          "$ref": "#"
+        }
+      }
+    }
+  ]
+}

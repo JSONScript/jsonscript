@@ -1,0 +1,32 @@
+{
+  "name": "calc",
+  "description": "short calculations syntax",
+  "rules": [
+    {
+      "description": "calculation",
+      "pattern": {
+        "\\$([+\\-*/=!<>&\\|^]{1,2})": 1
+      },
+      "script": {
+        "$exec": "calc",
+        "$method": { "$1": {
+          "+": "add",
+          "-": "subtract",
+          "*": "multiply",
+          "/": "divide",
+          "==": "equal",
+          "!=": "notEqual",
+          ">": "greater",
+          ">=": "greaterEqual",
+          "<": "lesser",
+          "<=": "lesserEqual",
+          "&&": "and",
+          "||": "or",
+          "^^": "xor",
+          "!": "not"
+        } },
+        "$args": 1
+      }
+    }
+  ]
+}

@@ -12,9 +12,9 @@ JSONScript is created to manage scripted execution in remote systems to avoid th
 
 JSONScript:
 
-- uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic)
+- uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic).
 - defines simple control structures.
-- is asynchronous and concurrent without the need to use any special keywords
+- is asynchronous and concurrent without the need to use any special keywords.
 - actual processing in the remote system is done synchronously or asynchronously by the functions and objects supplied to JSONScript interpreter by the host environment.
 
 

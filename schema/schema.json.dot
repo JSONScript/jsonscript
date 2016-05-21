@@ -1,11 +1,16 @@
 {
   "id": "http://www.json-script.com/schema/schema{{?it.strictSchema}}_strict{{?}}.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",
   "anyOf": [
     {{~ it.instructions:inst }}
-      { "$ref": "#{{=inst.name}}" }, 
+      { "$ref": "#{{=inst.name}}" },
+    {{~}}
+    {{~ it.macros:macro }}
+      {{~ macro.rules:rule:i }}
+        { "$ref": "#macro_{{=macro.name}}_{{=i}}" },
+      {{~}}
     {{~}}
     { "$ref": "#parallel" },
     { "$ref": "#sequential" },
@@ -46,6 +51,23 @@
         "additionalProperties": false,
         "required": {{= JSON.stringify(inst.required) }}
       },
+    {{~}}
+    {{~ it.macros:macro }}
+      {{~ macro.rules:rule:i }}
+        {{ var patternKey = Object.keys(rule.pattern)[0].replace(/\\/g, '\\\\'); }}
+        "_macro_{{=macro.name}}_{{=i}}": {
+          "id": "#macro_{{=macro.name}}_{{=i}}",
+          "description": "{{=macro.description}}",
+          "type": "object",
+          "patternProperties": {
+            "{{= patternKey }}": { "$ref": "#" }
+          },
+          "maxProperties": 1,
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternRequired": [ "{{= patternKey }}" ]
+        },
+      {{~}}
     {{~}}
     "parallel": {
       "id": "#parallel",

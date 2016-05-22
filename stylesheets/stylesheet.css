@@ -298,8 +298,8 @@ Full-Width Styles
 #forkme_banner {
   display: block;
   position: absolute;
-  top: 60px;
-  right: -94px;
+  top: -32px;
+  right: 0px;
   z-index: 10;
   padding: 10px 40px 10px 10px;
   color: #fff;
@@ -314,6 +314,12 @@ Full-Width Styles
   -ms-transform: rotate(-90deg);
   -o-transform: rotate(-90deg);
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+  transform-origin: 100% 100%;
+  -webkit-transform-origin: 100% 100%;
+  -moz-transform-origin: 100% 100%;
+  -ms-transform-origin: 100% 100%;
+  -o-transform-origin: 100% 100%;
 }
 
 #header_wrap {

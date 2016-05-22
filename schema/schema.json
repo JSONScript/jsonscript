@@ -200,65 +200,61 @@
       "id": "#macro_exec_0",
       "description": "short syntax for executor call",
       "type": "object",
-      "patternProperties": {
+      "patternGroups": {
         "^\\$\\$([^\\.]+)\\.([^\\.]+)$": {
-          "$ref": "#"
+          "schema": {
+            "$ref": "#"
+          },
+          "minimum": 1
         }
       },
       "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": false,
-      "patternRequired": [
-        "^\\$\\$([^\\.]+)\\.([^\\.]+)$"
-      ]
+      "additionalProperties": false
     },
     "_macro_exec_1": {
       "id": "#macro_exec_1",
       "description": "short syntax for executor call",
       "type": "object",
-      "patternProperties": {
+      "patternGroups": {
         "^\\$\\$([^\\.]+)$": {
-          "$ref": "#"
+          "schema": {
+            "$ref": "#"
+          },
+          "minimum": 1
         }
       },
       "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": false,
-      "patternRequired": [
-        "^\\$\\$([^\\.]+)$"
-      ]
+      "additionalProperties": false
     },
     "_macro_call_0": {
       "id": "#macro_call_0",
       "description": "short syntax for function call",
       "type": "object",
-      "patternProperties": {
+      "patternGroups": {
         "^\\$\\#(.+)$": {
-          "$ref": "#"
+          "schema": {
+            "$ref": "#"
+          },
+          "minimum": 1
         }
       },
       "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": false,
-      "patternRequired": [
-        "^\\$\\#(.+)$"
-      ]
+      "additionalProperties": false
     },
     "_macro_calc_0": {
       "id": "#macro_calc_0",
       "description": "short calculations syntax",
       "type": "object",
-      "patternProperties": {
+      "patternGroups": {
         "\\$([+\\-*/=!<>&\\|^]{1,2})": {
-          "$ref": "#"
+          "schema": {
+            "$ref": "#"
+          },
+          "minimum": 1
         }
       },
       "maxProperties": 1,
-      "minProperties": 1,
-      "additionalProperties": false,
-      "patternRequired": [
-        "\\$([+\\-*/=!<>&\\|^]{1,2})"
-      ]
+      "additionalProperties": false
     },
     "parallel": {
       "id": "#parallel",

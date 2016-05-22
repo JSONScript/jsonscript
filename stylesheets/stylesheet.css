@@ -1,13 +1,8 @@
-/*******************************************************************************
-Slate Theme for GitHub Pages
-by Jason Costello, @jsncostello
-*******************************************************************************/
-
 @import url(github-light.css);
 
-/*******************************************************************************
-MeyerWeb Reset
-*******************************************************************************/
+html, body {
+  height: 100%;
+}
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -197,7 +192,7 @@ pre, code {
 pre {
   width: 100%;
   padding: 10px;
-  box-shadow: 0 0 4px rgba(0,0,0,.1);
+  box-shadow: 0 0 6px rgba(0,0,0,.1);
   overflow: auto;
 }
 
@@ -339,7 +334,7 @@ Full-Width Styles
   border: none;
   float: left;
   padding: 0;
-  margin-right: 40px;
+  margin-right: 32px;
   box-shadow: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
@@ -368,10 +363,11 @@ Full-Width Styles
   background: #fffefd;
   border-top: 1px solid #f84800;
   border-bottom: 1px solid #f84800;
+  min-height: 100%;
 }
 
 #main_content {
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 #footer_wrap {

@@ -50,23 +50,6 @@ JSONScript can include several instructions that will be executed sequentially:
 
 ```json
 [
-  {
-    "$exec": "router",
-    "$method": "get",
-    "$args": { "path": "/resource/1" }
-  },
-  {
-    "$exec": "router",
-    "$method": "put",
-    "$args": { "path": "/resource/1", "body": "test" }
-  }
-]
-```
-
-or with short syntax:
-
-```json
-[
   { "$$router.get": { "path": "/resource/1" } },
   { "$$router.put": { "path": "/resource/1", "body": "test" } }
 ]
@@ -81,37 +64,6 @@ The result of the evaluation of the whole script above is a single asynchronous 
 Sequential evaluation is not limited to executing individual instructions - any scripts can be combined using this JSONScript primitive.
 
 For example, this script does the same as the script above for two resources:
-
-```json
-[
-  [
-    {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": "/resource/1" }
-    },
-    {
-      "$exec": "router",
-      "$method": "put",
-      "$args": { "path": "/resource/1", "body": "test" }
-    }
-  ],
-  [
-    {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": "/resource/2" }
-    },
-    {
-      "$exec": "router",
-      "$method": "put",
-      "$args": { "path": "/resource/2", "body": "test" }
-    }
-  ]
-]
-```
-
-or with short syntax:
 
 ```json
 [
@@ -136,23 +88,6 @@ JSONScript can include several instructions that will be executed in parallel:
 
 ```json
 {
-  "res1": {
-    "$exec": "router",
-    "$method": "get",
-    "$args": { "path": "/resource/1" }
-  },
-  "res2": {
-    "$exec": "router",
-    "$method": "get",
-    "$args": { "path": "/resource/2" }
-  }
-}
-```
-
-or with short syntax:
-
-```json
-{
   "res1": { "$$router.get": { "path": "/resource/1" } },
   "res2": { "$$router.get": { "path": "/resource/2" } }
 }
@@ -167,37 +102,6 @@ The names of properties in the object can be any strings that do NOT start with 
 Parallel evaluation is not limited to executing individual instructions - any scripts can be combined using this JSONScript primitive.
 
 For example, the script below is similar to the example in the previous section that updates two resources but it does it in parallel:
-
-```json
-{
-  "res1": [
-    {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": "/resource/1" }
-    },
-    {
-      "$exec": "router",
-      "$method": "put",
-      "$args": { "path": "/resource/1", "body": "test" }
-    }
-  ],
-  "res2": [
-    {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": "/resource/2" }
-    },
-    {
-      "$exec": "router",
-      "$method": "put",
-      "$args": { "path": "/resource/2", "body": "test" }
-    }
-  ]
-}
-```
-
-or with short syntax:
 
 ```json
 {
@@ -224,23 +128,6 @@ Let's see what other instructions are defined in JSONScript core.
 ## Accessing data instance with `$data`
 
 During the evaluation the script can use the data instance passed to the interpeter in addition to the script:
-
-```json
-[
-  {
-    "$exec": "router",
-    "$method": "get",
-    "$args": { "path": { "$data": "/path" } }
-  },
-  {
-    "$exec": "router",
-    "$method": "put",
-    "$args": { "$data": "" }
-  }
-]
-```
-
-or with short syntax:
 
 ```json
 [
@@ -316,24 +203,6 @@ JSONScript interpreters should both try to determine such situations as early as
 
 ```json
 {
-  "$if": { "$exec": "checkAvailability", "$args": "router1" },
-  "$then": {
-    "$exec": "router1",
-    "$method": "get",
-    "$args": { "path": "/resource/1" }
-  },
-  "$else": {
-    "$exec": "router2",
-    "$method": "get",
-    "$args": { "path": "/resource/1" }
-  }
-}
-```
-
-or with short syntax:
-
-```json
-{
   "$if": { "$$checkAvailability": "router1" },
   "$then": { "$$router1.get": { "path": "/resource/1" } },
   "$else": { "$$router2.get": { "path": "/resource/1" } }
@@ -353,7 +222,7 @@ Scalar values can be used in any place where the script is expected - they evalu
 ```json
 {
   "$exec": {
-    "$if": { "$exec": "checkAvailability", "$args": "router1" },
+    "$if": { "$$checkAvailability": "router1" },
     "$then": "router1",
     "$else": "router2"
   },
@@ -367,7 +236,7 @@ or using reference:
 ```json
 {
   "router": {
-    "$if": { "$exec": "checkAvailability", "$args": "router1" },
+    "$if": { "$$checkAvailability": "router1" },
     "$then": "router1",
     "$else": "router2"
   },
@@ -388,26 +257,6 @@ or using reference:
 
 ```json
 {
-  "res1": {
-    "$exec": "router",
-    "$method": "get",
-    "$args": { "path": "/resource/1" }
-  },
-  "res2": {
-    "$delay": {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": "/resource/2" }
-    },
-    "$wait": 50
-  }
-}
-```
-
-or with short syntax:
-
-```json
-{
   "res1": { "$$router.get": { "path": "/resource/1" } },
   "res2": {
     "$delay": { "$$router.get": { "path": "/resource/2" } },
@@ -419,19 +268,6 @@ or with short syntax:
 The evaluation result will be the same as without `$delay` istruction, but the second "$exec" instruction will start executing at least 50 milliseconds later than the first.
 
 This instruction can also be used to create asynchronous value from synchronous value. For example if some executor expects an asynchronous value as an argument and you want to pass a constant, you can use `$delay`:
-
-```json
-{
-  "$exec": "logger",
-  "$method": "resolve",
-  "$args": {
-    "message": "Resolved",
-    "asyncValue": { "$delay": "test", "$wait": 1000 }
-  }
-}
-```
-
-or with short syntax:
 
 ```json
 {
@@ -450,34 +286,6 @@ In the example above a hypothetical logger logs message when asynchronous value 
 ## Defining and calling functions with `$func` and `$call`
 
 Anonymous or named function can be defined in the script to be passed to executors (either predefined or supplied by user) or simply to be used multiple times.
-
-```json
-[
-  {
-    "$func": {
-      "$exec": "router",
-      "$method": "get",
-      "$args": { "path": { "$data": "/path" } }
-    },
-    "$name": "getRes",
-    "$args": [ "path" ]
-  },
-  {
-    "$call": "getRes",
-    "$args": [ "/resource/1" ]
-  },
-  {
-    "$call": { "$ref": "/0" },
-    "$args": { "path": "/resource/2" }
-  },
-  {
-    "$call": { "$ref": "1/0" },
-    "$args": "/resource/3"
-  }
-]
-```
-
-or with short syntax:
 
 ```json
 [
@@ -504,32 +312,6 @@ Functions can be used as parameters in the executors:
 
 ```json
 {
-  "$exec": "array",
-  "$method": "map",
-  "$args": {
-    "data": [
-      "/resource/1",
-      "/resource/2",
-      "/resource/3"
-    ],
-    "iterator": {
-      "$func": {
-        "$exec": "router1",
-        "$method": "get",
-        "$args": {
-          "path": { "$data": "/path" }
-        }
-      },
-      "$args": ["path"]
-    }
-  }
-}
-```
-
-or with short syntax:
-
-```json
-{
   "$$array.map": {
     "data": [
       "/resource/1",
@@ -545,6 +327,8 @@ or with short syntax:
   }
 }
 ```
+
+See [Array iteration](#array-iteration).
 
 If the function was previously defined it can be passed either using `"$ref"` with an absolute or relative JSON-pointer or `{ "$func": "myfunc" }. The latter always evaluates as the reference to the existing function rather than the function that always returns string "myfunc", to define the function that always returns the same string you can use "$quote".
 
@@ -566,9 +350,7 @@ evaluates as: `{ "$exec": "myExec" }` and the executor is not called.
 `$quote` can also be used to define the function that always returns the same string:
 
 ```json
-{
-  "$func": { "$quote": "foo" }
-}
+{ "$func": { "$quote": "foo" } }
 ```
 
 The anonymous function defined above always returns the string `"foo"`. Without `$quote` it would have been the reference to the function with the name `foo`.

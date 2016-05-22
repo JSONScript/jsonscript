@@ -1,5 +1,7 @@
 # JSONScript syntax
 
+In progress - not complete, see [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md).
+
 
 ## Script
 

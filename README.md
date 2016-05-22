@@ -1,21 +1,50 @@
 # JSONScript
 
-Platform independent asynchronous and concurrent scripting language using JSON format.
-
-JSONScript is created to manage scripted execution in remote systems to avoid the latency between requests and unnecessary transfers of intermediary results.
+Language for scripted server-side processing of existing endpoints and services.
 
 [![Build Status](https://travis-ci.org/JSONScript/jsonscript.svg?branch=master)](https://travis-ci.org/JSONScript/jsonscript)
 [![npm version](https://badge.fury.io/js/jsonscript.svg)](https://www.npmjs.com/package/jsonscript)
 
 
-## Features
+## Script example
 
-JSONScript:
+```json
+{
+  "$$array.map": {
+    "data": [
+      { "path": "/resource/1", "body": { "test": 1 } },
+      { "path": "/resource/2", "body": { "test": 2 } },
+      { "path": "/resource/3", "body": { "test": 3 } },
+    ],
+    "iterator": {
+      "$func": [
+        { "$$router.get": { "path": { "$data": "/path" } } },
+        { "$$router.put": { "$data": "/" } },
+      ],
+      "$args": ["path", "body"]
+    }
+  }
+}
+```
 
-- uses JSON as its representaion format for both data and control structures, being similar to lisp (homoiconic).
-- defines simple control structures.
-- is asynchronous and concurrent without the need to use any special keywords.
-- actual processing in the remote system is done synchronously or asynchronously by the functions and objects supplied to JSONScript interpreter by the host environment.
+Using YAML for the same script makes it more readable:
+
+```yaml
+$$array.map:
+  data:
+    - { path: /resource/1, body: { test: 1 } }
+    - { path: /resource/2, body: { test: 2 } }
+    - { path: /resource/3, body: { test: 3 } }
+  iterator:
+    $func:
+      - $$router.get: { path: { $data: /path } }
+      - $$router.put: { $data: / }
+    $args: [ path, body ]
+```
+
+When executed on the server, the script above iterates array of requests, retrieves resource for each path and then updates it with a new value.
+
+See [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md).
 
 
 ## Problem
@@ -45,17 +74,12 @@ At the same time JSONScript allows keeping the remote system completely secure a
 As the script executes, each instruction returns some data. By default this data replaces the script itself and all results will be available to the interpreter to pass back to the host system that requested execution. Host system usually sends results back to the client, but can do anything else with them, e.g. logging, storing to the database, etc.).
 
 
-## Language
-
-See [Language](https://github.com/JSONScript/jsonscript/blob/master/LANGUAGE.md)
-
-
 ## Schema
 
 See [Schema](https://github.com/JSONScript/jsonscript/blob/master/SCHEMA.md) for JSON-schemas for the script and for instruction definitions.
 
 
-## Implementation
+## Implementations
 
 JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)
 

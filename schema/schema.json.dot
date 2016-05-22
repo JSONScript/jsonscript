@@ -59,14 +59,13 @@
           "id": "#macro_{{=macro.name}}_{{=i}}",
           "description": "{{=macro.description}}",
           "type": "object",
-          "patternGroups": {
-            "{{= patternKey }}": {
-              "schema": { "$ref": "#" },
-              "minimum": 1
-            }
+          "patternProperties": {
+            "{{= patternKey }}": { "$ref": "#" }
           },
           "maxProperties": 1,
-          "additionalProperties": false
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternRequired": [ "{{= patternKey }}" ]
         },
       {{~}}
     {{~}}

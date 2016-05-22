@@ -29,7 +29,7 @@
     {
       "file": "README.md",
       "page": "index",
-      "title": "JSONScript - Asynchronous scripting language using JSON format"
+      "title": "JSONScript - Scripted server-side processing of existing endpoints and services"
     },
     {
       "file": "LANGUAGE.md",

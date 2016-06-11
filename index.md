@@ -1,6 +1,6 @@
 ---
 page_name: index
-title: JSONScript - Asynchronous scripting language using JSON format
+title: JSONScript - Scripted server-side processing of existing endpoints and services
 layout: main
 ---
 # JSONScript
@@ -88,7 +88,9 @@ See [Schema](schema.html) for JSON-schemas for the script and for instruction de
 
 JSONScript interpreter for node-js: [jsonscript-js](https://github.com/epoberezkin/jsonscript-js)
 
-Express 4 middleware/route-handler: [jsonscript-express](https://github.com/JSONScript/jsonscript-express) (it supports evaluating JSONScript using existing express app routes)
+Express 4 middleware/route-handler: [jsonscript-express](https://github.com/JSONScript/jsonscript-express) (it supports scripted processing of existing express app routes)
+
+Proxy server: [jsonscript-proxy](https://github.com/JSONScript/jsonscript-proxy) (it supports scripted processing of other existing services).
 
 
 ## License

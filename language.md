@@ -416,6 +416,25 @@ Defined operations:
 | not          |"$!" |negates boolean value|
 
 
+## String operations
+
+Predefined executor `str` defines methods for string operations:
+
+```json
+{ "$$str.concat": [ "a", "b", "c" ] }
+```
+
+Defined operations:
+
+| method  |arguments|evaluation|
+|---------|---------|----------|
+| concat  |[s1, s2, ...]  |concatenate all arguments (must be strings)|
+| slice   |[s, begin, end]|get substring of string `s` from index `begin` until index `end` (not included), omitted end means until the end of string, negative index - count from the end|
+| pos     |[s1, s2]|position of string `s2` in string `s1`|
+| lower   |s|convert string to lower case|
+| upper   |s|convert string to upper case|
+
+
 ## Array iteration
 
 Predefined executor `array` implements methods for array iteration:

@@ -2,10 +2,10 @@
   {
     "description": "sequential evaluation",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#sequential" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#sequential" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#sequential" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#sequential" }
     ],
     "tests": [
       {

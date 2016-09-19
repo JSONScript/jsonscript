@@ -1,5 +1,5 @@
 {
-  "id": "http://www.json-script.com/schema/evaluate.json#",
+  "id": "http://www.jsonscript.org/schema/evaluate.json#",
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "title": "JSONScript evaluation schema",
   "description": "Schema with custom keywords that evaluates JSON script. It assumes that the script is valid",

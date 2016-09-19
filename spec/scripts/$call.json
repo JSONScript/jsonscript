@@ -2,10 +2,10 @@
   {
     "description": "$call - function call",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$call" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$call" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$call" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$call" }
     ],
     "tests": [
       {
@@ -70,10 +70,10 @@
   {
     "description": "$call syntax errors",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$call" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$call" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$call" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$call" }
     ],
     "tests": [
       {

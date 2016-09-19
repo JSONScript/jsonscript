@@ -2,10 +2,10 @@
   {
     "description": "$ref - reference to the script being evaluated",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$ref" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$ref" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$ref" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$ref" }
     ],
     "tests": [
       {
@@ -38,8 +38,8 @@
   {
     "description": "$if syntax errors",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$ref" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$ref" }
     ],
     "tests": [
       {
@@ -57,8 +57,8 @@
   {
     "description": "$if syntax errors with strict schema",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$ref" }
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$ref" }
     ],
     "tests": [
       {

@@ -2,10 +2,10 @@
   {
     "description": "$exec - call to external executor",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$exec" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$exec" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$exec" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$exec" }
     ],
     "tests": [
       {
@@ -101,8 +101,8 @@
   {
     "description": "$exec syntax errors",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema.json#$exec" }
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema.json#$exec" }
     ],
     "tests": [
       {
@@ -130,8 +130,8 @@
   {
     "description": "$exec syntax errors with strict schema",
     "schemas": [
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#" },
-      { "$ref": "http://www.json-script.com/schema/schema_strict.json#$exec" }
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#" },
+      { "$ref": "http://www.jsonscript.org/schema/schema_strict.json#$exec" }
     ],
     "tests": [
       {

@@ -1,5 +1,5 @@
 {
-  "id": "http://www.json-script.com/schema/macro.json#",
+  "id": "http://www.jsonscript.org/schema/macro.json#",
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "description": "schema for macro definition",
   "type": "object",

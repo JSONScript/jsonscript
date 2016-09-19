@@ -1,5 +1,5 @@
 {
-  "id": "http://www.json-script.com/schema/schema.json#",
+  "id": "http://www.jsonscript.org/schema/schema.json#",
   "$schema": "https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#",
   "title": "JSONScript schema",
   "description": "JSONScript script with instructions (generated from template)",
